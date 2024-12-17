@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "743881940512",
+    "project_id": "growmind-8d0b6",
+    "storage_bucket": "growmind-8d0b6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743881940512:android:558356651bbd5525e5e645",
+        "android_client_info": {
+          "package_name": "com.example.growmind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-3W06Wkup6dNLFSXoBjHDY3QNvBYzEzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743881940512:android:784594d9faaa307ae5e645",
+        "android_client_info": {
+          "package_name": "com.example.growmind_tutuor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-3W06Wkup6dNLFSXoBjHDY3QNvBYzEzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
