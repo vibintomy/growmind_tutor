@@ -23,11 +23,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
     const ChatPage(),
     const ProfilePage()
   ];
-  List<IconData> listOfIcons = [
-    Icons.home_rounded,
-    Icons.chat,
-    Icons.person
-  ];
+  List<IconData> listOfIcons = [Icons.home_rounded, Icons.chat, Icons.person];
 
   void setPage(int index) {
     setState(() {
@@ -41,22 +37,12 @@ class _BottomNavigationState extends State<BottomNavigation> {
       extendBody: true,
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
-         
-           if (notification.direction == ScrollDirection.reverse) {
-           
-            Future.delayed(const Duration(seconds: 100), () {
-               bottomNavBarVisible.value = false;
-            });
-          } else if (notification.direction == ScrollDirection.forward) {
-             
-            Future.delayed(const Duration(seconds: 100), () {
-             if(!bottomNavBarVisible.value){
-               bottomNavBarVisible.value = true; 
-             }
-            });
+          if (notification.direction == ScrollDirection.reverse) {
+            bottomNavBarVisible.value = true;
+          } else if (notification.direction == ScrollDirection.forward) {          
+              bottomNavBarVisible.value = true;           
           }
-          
-         
+
           return true;
         },
         child: IndexedStack(
@@ -68,15 +54,13 @@ class _BottomNavigationState extends State<BottomNavigation> {
         valueListenable: bottomNavBarVisible,
         builder: (context, isVisible, child) {
           return AnimatedContainer(
-            
             duration: const Duration(milliseconds: 300),
             height: isVisible ? kBottomNavigationBarHeight + 15 : 0,
             child: isVisible ? child : const SizedBox.shrink(),
           );
         },
-        
-        child: Padding( 
-          padding: const EdgeInsets.all( 1.0),
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
           child: Container(
             height: 50,
             decoration: BoxDecoration(
@@ -103,13 +87,12 @@ class _BottomNavigationState extends State<BottomNavigation> {
                       currentIndex = index;
                     });
                   },
-                  textStyle: const TextStyle(color: Colors.white
-                  ,
+                  textStyle: const TextStyle(
+                    color: Colors.white,
                   ),
-                  
                   tabBackgroundColor: mainColor,
                   selectedIndex: currentIndex,
-                  tabs:const  [
+                  tabs: const [
                     GButton(
                       icon: Icons.home,
                       text: 'Home',
@@ -119,7 +102,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
                       text: 'Chat',
                     ),
                     GButton(
-                     
                       icon: Icons.person,
                       text: 'profile',
                     )

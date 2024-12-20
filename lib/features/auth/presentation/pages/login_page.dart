@@ -1,14 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
+import 'package:growmind_tutuor/features/auth/data/datasource/auth_local_datasource.dart';
+import 'package:growmind_tutuor/features/auth/data/models/user_model.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_event.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_state.dart';
+import 'package:growmind_tutuor/features/auth/presentation/pages/forgot_password.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/signup_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/googlebutton.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
-
 
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -109,10 +112,21 @@ class LoginPage extends StatelessWidget {
                           },
                         ),
                         kheight,
-                        const Text(
-                          'Agree to terms and condtions',
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ForgotPassword()));
+                          },
+                          child: const Align(
+                            alignment: Alignment.centerRight,
+                            child:  Text(
+                              'Forgot password ?',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: mainColor),
+                            ),
+                          ),
                         ),
                         kheight1,
                         Center(
@@ -120,6 +134,7 @@ class LoginPage extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: mainColor,
                                 minimumSize: const Size(350, 50),
+                                
                               ),
                               onPressed: () {
                                 if (formkey.currentState!.validate()) {
@@ -208,14 +223,35 @@ class LoginPage extends StatelessWidget {
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
           email: email, password: password);
-      if (userCredential.user?.emailVerified == false) {
+
+      final user = userCredential.user;
+      if (user == null || user.emailVerified == true) {
         // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Colors.green,
-              content: Text('Successfuly logged in')));
-      
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            backgroundColor: Colors.redAccent,
+            content:
+                Text('Email is not verified. Please enter a valid email')));
+        return;
       }
+      final userId = user.uid;
+      final userDoc = await FirebaseFirestore.instance
+          .collection('tutors')
+          .doc(userId)
+          .get();
+      if (!userDoc.exists) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Profile is not verified. please contact support')));
+        return;
+      }
+      final AuthLocalDataSource authLocalDataSource = AuthLocalDataSourceImpl();
+      final userModel = UserModel(
+          id: userId,
+          email: user.email ?? '',
+          displayName: user.displayName ?? '',
+          phone: user.phoneNumber ?? '');
+      await authLocalDataSource.cacheUser(userModel);
       // ignore: use_build_context_synchronously
       BlocProvider.of<AuthBloc>(context).add(LoginRequested(email, password));
       // ignore: use_build_context_synchronously
@@ -228,13 +264,11 @@ class LoginPage extends StatelessWidget {
       } else if (e.code == 'wrong-password') {
         errorMessage = 'Wrong password entered';
       } else {
-        errorMessage ='Check the inputs';
+        errorMessage = 'Check the inputs';
       }
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(errorMessage)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.redAccent, content: Text(errorMessage)));
     }
   }
 }

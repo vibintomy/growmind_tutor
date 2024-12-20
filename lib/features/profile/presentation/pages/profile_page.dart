@@ -9,7 +9,7 @@ import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dar
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_event.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_state.dart';
-
+import 'package:growmind_tutuor/features/profile/presentation/widgets/alert_box.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -24,11 +24,13 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
         backgroundColor: textColor,
         body: BlocProvider(
-          create: (_) => ProfileBloc(GetProfile(ProfileRepoImpl(
-              ProfileRemoteDatasource(FirebaseFirestore.instance)),
+          create: (_) => ProfileBloc(
+              GetProfile(
+                ProfileRepoImpl(
+                    ProfileRemoteDatasource(FirebaseFirestore.instance)),
               ),
-              ProfileRepoImpl(ProfileRemoteDatasource(FirebaseFirestore.instance))
-              )
+              ProfileRepoImpl(
+                  ProfileRemoteDatasource(FirebaseFirestore.instance)))
             ..add(LoadProfileEvent(user!.uid ?? "")),
           child:
               BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
@@ -87,23 +89,22 @@ class ProfilePage extends StatelessWidget {
                           color: Colors.grey,
                         ),
                         kheight1,
-                      const  Column(
+                        Column(
                           children: [
-                            const Row(
+                     const       Row(
                               children: [
                                 Icon(Icons.person),
                                 kwidth,
                                 Text(
                                   'Edit Profile',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Spacer(),
                                 Icon(Icons.arrow_forward)
                               ],
                             ),
                             kheight2,
-                         const   Row(
+                        const    Row(
                               children: [
                                 Icon(Icons.wallet),
                                 kwidth,
@@ -142,7 +143,7 @@ class ProfilePage extends StatelessWidget {
                               ],
                             ),
                             kheight2,
-                          const  Row(
+                           const Row(
                               children: [
                                 Icon(Icons.help_center),
                                 kwidth,
@@ -155,18 +156,7 @@ class ProfilePage extends StatelessWidget {
                               ],
                             ),
                             kheight2,
-                        const    Row(
-                              children: [
-                                Icon(Icons.logout),
-                                kwidth,
-                                Text(
-                                  'Log Out',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Spacer(),
-                                Icon(Icons.arrow_forward),
-                              ],
-                            ),
+                            alertBox(context),
                           ],
                         )
                       ],
@@ -186,4 +176,5 @@ class ProfilePage extends StatelessWidget {
           }),
         ));
   }
+
 }
