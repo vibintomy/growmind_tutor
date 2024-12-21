@@ -40,7 +40,8 @@ dependencies:
   google_nav_bar: ^5.0.7
   cloud_firestore: ^5.5.1
   cloudinary: ^1.2.0
-  http: ^1.2.2  
+  http: ^1.2.2
+  pinput: ^5.0.0  
 
 
   # The following adds the Cupertino Icons font to your application.
