@@ -62,7 +62,6 @@ class LoginPage extends StatelessWidget {
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                         kheight,
-                        
                         TextFormField(
                           controller: emailController,
                           decoration: const InputDecoration(
@@ -120,7 +119,7 @@ class LoginPage extends StatelessWidget {
                           },
                           child: const Align(
                             alignment: Alignment.centerRight,
-                            child:  Text(
+                            child: Text(
                               'Forgot password ?',
                               style: TextStyle(
                                   fontSize: 12,
@@ -135,7 +134,6 @@ class LoginPage extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: mainColor,
                                 minimumSize: const Size(350, 50),
-                                
                               ),
                               onPressed: () {
                                 if (formkey.currentState!.validate()) {
@@ -226,7 +224,9 @@ class LoginPage extends StatelessWidget {
           email: email, password: password);
 
       final user = userCredential.user;
-      if (user == null || user.emailVerified == true) {
+       
+
+      if (user == null || user.emailVerified == false) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             backgroundColor: Colors.redAccent,

@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +7,8 @@ import 'package:growmind_tutuor/features/auth/presentation/bloc/signup_bloc/sign
 class SignupBloc extends Bloc<SignupEvent, SignupState> {
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
-  SignupBloc({required this.auth,required this.firestore}) : super(SignupInitial()) {
+  SignupBloc({required this.auth, required this.firestore})
+      : super(SignupInitial()) {
     on<SignupSubmitted>(onSignupSubmitted);
   }
 
@@ -23,11 +23,29 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
         'email': event.email,
         'phone': event.phone,
         'uid': userCredential.user!.uid,
-        'created_at':FieldValue.serverTimestamp(),
+        'created_at': FieldValue.serverTimestamp(),
       });
-      emit(SignupSuccess());
-    } catch (e) {
-      emit(SignupFailure(e.toString()));
+
+      final user = userCredential.user;
+      if (user != null) {
+        await user.updateDisplayName(event.displayName);
+        await user.sendEmailVerification();
+        emit(SignupSuccess());
+      } else {
+        emit(const SignupFailure('User credential failed .please try again'));
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      if (e.code == 'email-already-in-use') {
+          errorMessage = 'This email is already in use.';
+        } else if (e.code == 'weak-password') {
+          errorMessage = 'The password is too weak.';
+        } else {
+          errorMessage = 'An error occurred. Please try again.';
+        }
+        emit(SignupFailure(errorMessage));
+      } catch (e) {
+        emit(SignupFailure('An error occurred: $e'));
     }
   }
 }
