@@ -9,8 +9,10 @@ import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_event.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_state.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/forgot_password.dart';
+import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_validation.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/signup_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/googlebutton.dart';
+import 'package:growmind_tutuor/features/auth/presentation/widgets/kyc.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
 
 class LoginPage extends StatelessWidget {
@@ -50,6 +52,7 @@ class LoginPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                     const   Kyc(),
                         kheight1,
                         SizedBox(
                           height: 150,
@@ -224,7 +227,6 @@ class LoginPage extends StatelessWidget {
           email: email, password: password);
 
       final user = userCredential.user;
-       
 
       if (user == null || user.emailVerified == false) {
         // ignore: use_build_context_synchronously

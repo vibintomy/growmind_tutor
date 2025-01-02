@@ -3,3 +3,4 @@ class User {
   final String email;
   User({required this.id, required this.email});
 }
+

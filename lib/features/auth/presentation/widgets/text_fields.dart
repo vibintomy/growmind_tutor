@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growmind_tutuor/core/utils/constants.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -30,6 +31,7 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         border: const OutlineInputBorder(
+        borderSide: BorderSide(color: mainColor),
             borderRadius: BorderRadius.all(Radius.circular(15))),
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon != null

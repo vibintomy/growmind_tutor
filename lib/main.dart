@@ -4,18 +4,24 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:growmind_tutuor/core/utils/service_locator.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
+import 'package:growmind_tutuor/features/auth/domain/usecases/kyc_usecases.dart';
+import 'package:growmind_tutuor/features/auth/presentation/bloc/kyc_bloc/kyc_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/signup_bloc/signup_bloc.dart';
+import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verification_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/login_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/splash_screen.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
-import 'package:growmind_tutuor/features/home/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+ 
   await Firebase.initializeApp();
-  runApp(MyApp());
+  setup();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize:const Size(372, 812),
+      designSize: const Size(372, 812),
       minTextAdapt: true,
       builder: (context, child) {
         return MultiBlocProvider(
@@ -36,7 +42,13 @@ class MyApp extends StatelessWidget {
               BlocProvider(
                   create: (context) => SignupBloc(
                       auth: FirebaseAuth.instance,
-                      firestore: FirebaseFirestore.instance))
+                      firestore: FirebaseFirestore.instance)),
+              BlocProvider(
+                create: (context) => TutorKycBloc(
+                    submitKycUseCase: getIt<SubmitKycUseCase>(),
+                    uploadPDFUseCase: getIt<UploadPDFUseCase>()),
+                child: KycVerificationPage(),
+              )
             ],
             child: MaterialApp(
               theme: ThemeData(
@@ -44,10 +56,11 @@ class MyApp extends StatelessWidget {
               color: textColor,
               debugShowCheckedModeBanner: false,
               initialRoute: '/splashscreen',
-              routes: {'/splashscreen': (context) =>const SplashScreen(),
-             
-              '/bottomnavigation':(context)=>const BottomNavigation(),
-               '/login':(context)=>LoginPage(),},
+              routes: {
+                '/splashscreen': (context) => const SplashScreen(),
+                '/bottomnavigation': (context) => const BottomNavigation(),
+                '/login': (context) => LoginPage(),
+              },
             ));
       },
     );
