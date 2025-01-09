@@ -1,15 +1,16 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_cloud_firestore/firebase_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
+import 'package:growmind_tutuor/core/utils/validator.dart';
 import 'package:growmind_tutuor/features/auth/data/datasource/auth_local_datasource.dart';
 import 'package:growmind_tutuor/features/auth/data/models/user_model.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_event.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/login_bloc/auth_state.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/forgot_password.dart';
-import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_validation.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/signup_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/googlebutton.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/kyc.dart';
@@ -52,7 +53,7 @@ class LoginPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                     const   Kyc(),
+                        const Kyc(),
                         kheight1,
                         SizedBox(
                           height: 150,
@@ -66,54 +67,32 @@ class LoginPage extends StatelessWidget {
                         ),
                         kheight,
                         TextFormField(
-                          controller: emailController,
-                          decoration: const InputDecoration(
-                              hintText: 'E-mail',
-                              prefixIcon: Icon(Icons.mail),
-                              border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)))),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please enter valid mail';
-                            }
-                            if (!RegExp(
-                                    r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
-                                .hasMatch(value)) {
-                              return 'Please enter a valid email address';
-                            }
-
-                            return null;
-                          },
-                        ),
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                                hintText: 'E-mail',
+                                prefixIcon: Icon(Icons.mail),
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)))),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: validateEmail),
                         kheight,
                         TextFormField(
-                          obscureText: isObscure,
-                          controller: passwordController,
-                          decoration: InputDecoration(
-                              border: const OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15))),
-                              prefixIcon: const Icon(Icons.lock),
-                              suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    isObscure = !isObscure;
-                                    (context as Element).markNeedsBuild();
-                                  },
-                                  child: const Icon(Icons.remove_red_eye)),
-                              hintText: 'password'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'please enter the password';
-                            }
-
-                            if (value.length <= 3 || value.length >= 15) {
-                              return 'please enter a valid password';
-                            }
-                            return null;
-                          },
-                        ),
+                            obscureText: isObscure,
+                            controller: passwordController,
+                            decoration: InputDecoration(
+                                border: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15))),
+                                prefixIcon: const Icon(Icons.lock),
+                                suffixIcon: GestureDetector(
+                                    onTap: () {
+                                      isObscure = !isObscure;
+                                      (context as Element).markNeedsBuild();
+                                    },
+                                    child: const Icon(Icons.remove_red_eye)),
+                                hintText: 'password'),
+                            validator: validatePassword),
                         kheight,
                         GestureDetector(
                           onTap: () {
@@ -221,6 +200,7 @@ class LoginPage extends StatelessWidget {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Fill the tables')));
     }
+    final FirebaseFirestore firestore;
 
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
@@ -236,6 +216,49 @@ class LoginPage extends StatelessWidget {
                 Text('Email is not verified. Please enter a valid email')));
         return;
       }
+
+      final kycCollection = FirebaseFirestore.instance.collection('kyc');
+      final querySnapshot =
+          await kycCollection.where('vemail', isEqualTo: email).limit(1).get();
+      if (querySnapshot.docs.isEmpty) {
+         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                  title: 'email not registered ',
+                                  message:
+                                      'email is not registered for kyc!',
+                                  contentType: ContentType.warning)));
+                           return;
+                      }
+
+                      final kycData = querySnapshot.docs.first.data();
+                   if (kycData['status'] != 'Accepted') {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                  title: 'Profile not verified ',
+                                  message:
+                                      'Your profile is not verified by our team',
+                                  contentType: ContentType.warning)));
+        return;
+      }
+       if (kycData['status'] == 'pending') {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              elevation: 0,
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.transparent,
+                              content: AwesomeSnackbarContent(
+                                  title: 'Profile not verified ',
+                                  message:
+                                      'Your profile is not verified by our team',
+                                  contentType: ContentType.help)));
+        return;
+      }
+
       final userId = user.uid;
       final userDoc = await FirebaseFirestore.instance
           .collection('tutors')

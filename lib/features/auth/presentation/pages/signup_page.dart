@@ -2,6 +2,7 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
+import 'package:growmind_tutuor/core/utils/validator.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/signup_bloc/signup_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/signup_bloc/signup_event.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/signup_bloc/signup_state.dart';
@@ -55,28 +56,15 @@ class SignupPage extends StatelessWidget {
                     ),
                     kheight2,
                     CustomTextField(
-                        controller: nameController,
-                        hintText: 'Name',
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'please enter the name';
-                          }
-                          return null;
-                        }),
+                      controller: nameController,
+                      hintText: 'Name',
+                      keyboardType: TextInputType.name,
+                      validator: validateName,
+                    ),
                     kheight1,
                     CustomTextField(
                       controller: emailController,
-                      validator: (p0) {
-                        if (p0 == null || p0.isEmpty) {
-                          return 'Enter the mail';
-                        }
-                        if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
-                            .hasMatch(p0)) {
-                          return 'Please enter a valid email address';
-                        }
-                        return null;
-                      },
+                      validator: validateEmail,
                       hintText: 'Email',
                       prefixIcon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
@@ -88,16 +76,7 @@ class SignupPage extends StatelessWidget {
                       hintText: 'password',
                       suffixIcon: Icons.remove_red_eye,
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'please enter the password';
-                        }
-
-                        if (value.length <= 3 || value.length >= 15) {
-                          return 'please enter a valid password';
-                        }
-                        return null;
-                      },
+                      validator: validatePassword,
                     ),
                     kheight1,
                     CustomTextField(
@@ -121,18 +100,13 @@ class SignupPage extends StatelessWidget {
                         return null;
                       },
                     ),
-                    kheight1, 
+                    kheight1,
                     CustomTextField(
                       controller: phoneController,
                       prefixIcon: Icons.phone,
                       hintText: '(+91) phone',
                       keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return ' enter the phone number';
-                        }
-                        return null;
-                      },
+                      validator: validatePhone,
                     ),
                     kheight2,
                     BlocConsumer<SignupBloc, SignupState>(
@@ -174,6 +148,11 @@ class SignupPage extends StatelessWidget {
                                     email: emailController.text.trim(),
                                     password: passwordController.text.trim(),
                                     phone: phoneController.text.trim()));
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()),
+                                    (Route<dynamic> route) => false);
                               }
                             },
                             child: Row(
@@ -199,9 +178,8 @@ class SignupPage extends StatelessWidget {
                               ],
                             ));
                       },
-                    ),kheight,
-
-                  
+                    ),
+                    kheight,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

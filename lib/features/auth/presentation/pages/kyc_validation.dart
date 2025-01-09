@@ -1,8 +1,11 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/core/utils/validator.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verification_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/text_fields.dart';
+import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
 
 class KycValidation extends StatelessWidget {
   KycValidation({super.key});
@@ -61,11 +64,9 @@ class KycValidation extends StatelessWidget {
                           backgroundColor: mainColor,
                           minimumSize: const Size(350, 50)),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                     KycVerificationPage()));
+                        if (formKey.currentState!.validate()) {
+                          loginUser(context);
+                        }
                       },
                       child: const Text(
                         'Confirm mail',
@@ -76,6 +77,52 @@ class KycValidation extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void loginUser(BuildContext context) async {
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Error',
+          message: 'Please enter an email address!',
+          contentType: ContentType.failure,
+        ),
+      ));
+      return;
+    }
+
+    // Query the 'tutors' collection to find a matching email
+    final kycCollection = FirebaseFirestore.instance.collection('tutors');
+    final querySnapshot =
+        await kycCollection.where('email', isEqualTo: email).limit(1).get();
+
+    if (querySnapshot.docs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Email Not Found',
+          message: 'The entered email is not registered!',
+          contentType: ContentType.warning,
+        ),
+      ));
+      return;
+    }
+
+
+   
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KycVerificationPage(),
       ),
     );
   }

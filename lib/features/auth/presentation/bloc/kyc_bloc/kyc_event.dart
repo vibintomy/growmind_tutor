@@ -7,9 +7,14 @@ class UploadPDFEvent extends TutorKycEvent {
 
 class SubmitKycEvent extends TutorKycEvent {
   final String name;
+  final String email;
   final String profession;
   final String pdfUrl;
 
-  SubmitKycEvent(
-      {required this.name, required this.pdfUrl, required this.profession});
+  SubmitKycEvent({
+    required this.name,
+    required this.email,
+    required this.pdfUrl,
+    required this.profession,
+  });
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
-
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/core/utils/validator.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/kyc_bloc/kyc_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/kyc_bloc/kyc_event.dart';
+import 'package:growmind_tutuor/features/auth/presentation/pages/login_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/text_fields.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -25,10 +27,10 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
     try {
       FilePickerResult? result = await FilePicker.platform
           .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
-    
+
       if (result != null && result.files.single.path != null) {
         final String pickedFilePath = result.files.single.path!;
-          print('This is the path $pickedFilePath');
+        print('This is the path $pickedFilePath');
         if (await File(pickedFilePath).exists()) {
           setState(() {
             filepath = pickedFilePath;
@@ -46,7 +48,7 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
   }
 
   final TextEditingController nameController = TextEditingController();
-
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController professionController = TextEditingController();
   @override
   void initState() {
@@ -97,6 +99,15 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
                     controller: nameController,
                     validator: validateName,
                     hintText: 'Name'),
+                kheight1,
+                const Text(
+                  'Please enter your email ',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                CustomTextField(
+                    controller: emailController,
+                    validator: validateEmail,
+                    hintText: 'Email'),
                 kheight1,
                 const Text(
                   'Please enter your profession',
@@ -161,11 +172,17 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
                     onPressed: () {
                       if (filepath != null &&
                           nameController.text.isNotEmpty &&
-                          professionController.text.isNotEmpty) {
+                          professionController.text.isNotEmpty &&
+                          emailController.text.isNotEmpty) {
                         context.read<TutorKycBloc>().add(SubmitKycEvent(
                             name: nameController.text,
+                            email: emailController.text,
                             pdfUrl: filepath!,
                             profession: professionController.text));
+                       
+                        loginUser(context);
+                        
+                      
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                             content: Text(
@@ -182,5 +199,56 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
         ),
       ),
     );
+  }
+
+  void loginUser(BuildContext context) async {
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Error',
+          message: 'Please enter an email address!',
+          contentType: ContentType.failure,
+        ),
+      ));
+      return;
+    }
+
+    // Query the 'tutors' collection to find a matching email
+    final kycCollection = FirebaseFirestore.instance.collection('tutors');
+    final querySnapshot =
+        await kycCollection.where('email', isEqualTo: email).limit(1).get();
+
+    if (querySnapshot.docs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Email Not Found',
+          message: 'The entered email is not registered!',
+          contentType: ContentType.warning,
+        ),
+      ));
+      return;
+    }
+      Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()));
+                                 ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                    title: 'kyc request sended',
+                                    message:
+                                        'Approval takes 1-3 business days ',
+                                    contentType: ContentType.success)));
   }
 }

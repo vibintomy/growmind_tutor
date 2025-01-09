@@ -17,8 +17,8 @@ GestureDetector alertBox(BuildContext context) {
                 TextButton(
                     onPressed: () {
                       logout();
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
+                      Navigator.pushAndRemoveUntil(context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),(Route<dynamic>route)=>false);
                     },
                     child: const Text(
                       'Yes',

@@ -1,3 +1,4 @@
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/features/auth/domain/usecases/kyc_usecases.dart';
 
@@ -14,7 +15,7 @@ class TutorKycBloc extends Bloc<TutorKycEvent, TutorKycState> {
       emit(UploadingPDF());
       try {
         final pdfUrl = await uploadPDFUseCase(event.filePath);
-     
+
         emit(PDFUploaded(pdfUrl));
       } catch (eroor) {
         emit(KYCEroor('Failed to upload PDF $eroor'));
@@ -24,9 +25,10 @@ class TutorKycBloc extends Bloc<TutorKycEvent, TutorKycState> {
     on<SubmitKycEvent>((event, emit) async {
       emit(KYCSubmitting());
       try {
-        // Use the submitKycUseCase to submit KYC data
         await submitKycUseCase(
+          
           name: event.name,
+          email: event.email,
           filePath: event.pdfUrl,
           profession: event.profession,
         );

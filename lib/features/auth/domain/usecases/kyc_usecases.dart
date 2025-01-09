@@ -14,7 +14,7 @@ class SubmitKycUseCase {
   final TutorRepositories repositories;
   SubmitKycUseCase(this.repositories);
 
-  Future<void> call({required String name,required String profession,required String filePath}) async {
-    return repositories.submitKyc(name:name,profession: profession,filePath: filePath);
+  Future<void> call({required String name,required String email,required String profession,required String filePath,}) async {
+    return repositories.submitKyc(name:name,email: email,profession: profession,filePath: filePath);
   }
 }
