@@ -13,7 +13,7 @@ import 'package:growmind_tutuor/features/auth/presentation/widgets/text_fields.d
 import 'package:pdfx/pdfx.dart';
 
 class KycVerificationPage extends StatefulWidget {
-  KycVerificationPage({super.key});
+ const KycVerificationPage({super.key});
 
   @override
   State<KycVerificationPage> createState() => _KycVerificationPageState();
@@ -30,7 +30,7 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
 
       if (result != null && result.files.single.path != null) {
         final String pickedFilePath = result.files.single.path!;
-        print('This is the path $pickedFilePath');
+       
         if (await File(pickedFilePath).exists()) {
           setState(() {
             filepath = pickedFilePath;
@@ -188,7 +188,7 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
                             content: Text(
                                 'please fill the fields to attach the document')));
                       }
-                    },
+                    },  
                     child: const Text(
                       'Submit',
                       style: TextStyle(color: textColor),
@@ -224,6 +224,7 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
         await kycCollection.where('email', isEqualTo: email).limit(1).get();
 
     if (querySnapshot.docs.isEmpty) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         elevation: 0,
         behavior: SnackBarBehavior.floating,
@@ -237,9 +238,11 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
       return;
     }
       Navigator.pushReplacement(
+                            // ignore: use_build_context_synchronously
                             context,
                             MaterialPageRoute(
                                 builder: (context) => LoginPage()));
+                                 // ignore: use_build_context_synchronously
                                  ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 elevation: 0,

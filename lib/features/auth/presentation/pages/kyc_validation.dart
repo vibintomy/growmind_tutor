@@ -40,12 +40,12 @@ class KycValidation extends StatelessWidget {
                   ),
                   kheight1,
                   const Text(
-                      ''' 1. To ensure compliance with regulatory standards and maintain the security of user accounts,email verification is mandatory
-                     
-                       2. Users must provide a valid and active email address for identification purposes Users are required to complete  the verification process within a specified timeframe, failing which access to certain services may be restricted.  
-                     
-                       3. All personal information collected during the verification process will be handled in accordance with data protection   laws and will not be shared with third parties without user consent'''),
-                  kheight2,
+                      '1. To ensure compliance with regulatory standards and maintain the security of user accounts,email verification is mandatory'  ),                      
+                  kheight,
+                const  Text('2. Users must provide a valid and active email address for identification purposes Users are required to complete  the verification process within a specified timeframe, failing which access to certain services may be restricted. '), 
+                kheight,
+                const    Text('3. All personal information collected during the verification process will be handled in accordance with data protection   laws and will not be shared with third parties without user consent'),
+                kheight1,
                   const Text(
                     'Enter your E-mail',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),

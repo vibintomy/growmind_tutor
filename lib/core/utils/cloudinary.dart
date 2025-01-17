@@ -19,13 +19,20 @@ class Cloudinary {
   }
 
   Future<String> uploadFile(File file, {String? resourceType}) async {
+    // Determine resource type based on file extension if not provided
     final extension = file.path.split('.').last.toLowerCase();
 
-    final resourceType = (extension == 'pdf') ? 'raw' : 'image';
+    final determinedResourceType = resourceType ??
+        (extension == 'pdf'
+            ? 'raw'
+            : (extension == 'mp4' || extension == 'avi' || extension == 'mov'
+                ? 'video'
+                : 'image'));
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('https://api.cloudinary.com/v1_1/dj01ka9ga/$resourceType/upload'),
+      Uri.parse(
+          'https://api.cloudinary.com/v1_1/$cloudName/$determinedResourceType/upload'),
     )
       ..fields['upload_preset'] = 'document_preset'
       ..fields['api_key'] = apiKey
@@ -51,6 +58,8 @@ class Cloudinary {
   Future<String> uploadPdf(File pdfFile) async {
     return await uploadFile(pdfFile, resourceType: 'raw');
   }
+
+  Future<String> uploadVideo(File videoFile) async {
+    return await uploadFile(videoFile, resourceType: 'video');
+  }
 }
-
-

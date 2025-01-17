@@ -14,6 +14,11 @@ import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verificatio
 import 'package:growmind_tutuor/features/auth/presentation/pages/login_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/splash_screen.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
+import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dart';
+import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +26,7 @@ void main() async {
  
   await Firebase.initializeApp();
   setup();
-  runApp(const MyApp());
+  runApp(const MyApp());  
 }
 
 class MyApp extends StatelessWidget {
@@ -47,8 +52,12 @@ class MyApp extends StatelessWidget {
                 create: (context) => TutorKycBloc(
                     submitKycUseCase: getIt<SubmitKycUseCase>(),
                     uploadPDFUseCase: getIt<UploadPDFUseCase>()),
-                child: KycVerificationPage(),
-              )
+                child: const  KycVerificationPage(),
+              ),
+              // BlocProvider(create: (context)=> ProfileBloc(getIt<GetProfile>(), getIt<ProfileRepo>()),child: HomePage(),),
+                 BlocProvider(create: (context)=> ProfileBloc(getIt<GetProfile>(),)),
+               BlocProvider(create: (context)=> CreateCourseBloc(getIt<UploadCourseUsecases>()))
+                 
             ],
             child: MaterialApp(
               theme: ThemeData(

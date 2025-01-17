@@ -18,8 +18,8 @@ const kwidth1 = SizedBox(
   width: 150,
 );
 
-
 //  color section
 
 const mainColor = Color(0xFFC82C55);
 const textColor = Colors.white;
+const greyColor = Colors.grey;
