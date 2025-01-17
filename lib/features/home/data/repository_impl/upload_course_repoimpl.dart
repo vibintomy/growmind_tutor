@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:growmind_tutuor/core/utils/cloudinary.dart';
@@ -10,50 +9,42 @@ class UploadCourseRepoImpl implements UploadDataRepo {
   final FirebaseFirestore firestore;
 
   UploadCourseRepoImpl(this.cloudinary, this.firestore);
-
-  @override
-  Future<Map<String, String>> uploadVedioImage(String vedioPath, String imagePath) async {
-    try {
-      final videoFile = File(vedioPath);
-      final imageFile = File(imagePath);
-      
-
-      // Upload video and image to Cloudinary
-      final videoUrl = await cloudinary.uploadVideo(videoFile);
-      final imageUrl = await cloudinary.uploadImage(imageFile);
-  
-      // Return URLs as a map
-      return {'videoUrl': videoUrl, 'imageUrl': imageUrl};
-    } catch (e) {
-      throw Exception('Cloudinary upload error: $e');
-    }
-  }
-
-  @override
+ @override
   Future<void> uploadCourse({
     required String courseName,
-    required String courseDiscription,
+    required String courseDescription,
     required String category,
     required String subCategory,
-    required List<Map<String, String>> sections, // Supports multiple sections
+    required List<Map<String, String>> sections,
     required String coursePrice,
     required String imagePath,
   }) async {
     try {
-      // Upload course image
       final imageFile = File(imagePath);
       final imageUrl = await cloudinary.uploadImage(imageFile);
+      List<Map<String, String>> updatedSections = [];
+      for (var section in sections) {
+        if (section['videoPath'] == null || section['videoPath']!.isEmpty) {
+          throw Exception('Invalid video file path for section: ${section['sectionName']}');
+        }
 
-      // Ensure user is logged in
+        final videoFile = File(section['videoPath']!);
+        final videoUrl = await cloudinary.uploadVideo(videoFile);
+        updatedSections.add({
+          'sectionName': section['sectionName']!,
+          'sectionDescription': section['sectionDescription']!,
+          'videoUrl': videoUrl, 
+        });
+      }
+
+    
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
         throw Exception('No user logged in');
       }
-
-      // Add course details to Firestore
       final courseDoc = await firestore.collection('courses').add({
         'courseName': courseName,
-        'courseDescription': courseDiscription,
+        'courseDescription': courseDescription,
         'category': category,
         'subCategory': subCategory,
         'coursePrice': coursePrice,
@@ -61,53 +52,50 @@ class UploadCourseRepoImpl implements UploadDataRepo {
         'createdBy': currentUser.uid,
         'createdAt': FieldValue.serverTimestamp(),
       });
+   
 
-      // Upload all sections associated with the course
-      for (var section in sections) {
-        if (section['sectionName'] == null ||
-            section['sectionDescription'] == null ||
-            section['vedioFilePath'] == null) {
-          throw Exception('Invalid section data provided');
-        }
-        await uploadSection(
-          courseId: courseDoc.id, // Pass the course ID
-          sectionName: section['sectionName']!,
-          sectionDescription: section['sectionDescription']!,
-          vedioFilePath: section['vedioFilePath']!,
-        );
+      for (var section in updatedSections) {
+        await firestore
+            .collection('courses')
+            .doc(courseDoc.id)
+            .collection('sections')
+            .add({
+          'sectionName': section['sectionName'],
+          'sectionDescription': section['sectionDescription'],
+          'videoUrl': section['videoUrl'],
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+     
       }
-
-      // Update the course document with its ID
-      await courseDoc.update({'id': courseDoc.id});
+ 
+      await courseDoc.update({'id': courseDoc.id});    
     } catch (e) {
       throw Exception('Firestore error: $e');
     }
   }
 
+
   @override
   Future<void> uploadSection({
-    required String courseId, // Pass course ID explicitly
+    required String courseId,
     required String sectionName,
     required String sectionDescription,
     required String vedioFilePath,
   }) async {
     try {
-      // Upload section video to Cloudinary
+    
       final videoFile = File(vedioFilePath);
       final videoUrl = await cloudinary.uploadVideo(videoFile);
-
-      // Add section details to Firestore
-      final sectionsCollection = firestore
+      await firestore
           .collection('courses')
-          .doc(courseId) // Use the correct course ID
-          .collection('sections');
-
-      await sectionsCollection.add({
+          .doc(courseId)
+          .collection('sections')
+          .add({
         'sectionName': sectionName,
         'sectionDescription': sectionDescription,
         'videoUrl': videoUrl,
         'createdAt': FieldValue.serverTimestamp(),
-      });
+      }); 
     } catch (e) {
       throw Exception('Error uploading section: $e');
     }

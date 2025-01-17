@@ -82,7 +82,7 @@ class _PricePageState extends State<PricePage> {
       );
       return;
     }
-    // Trigger the event to upload course details
+   
     context.read<CreateCourseBloc>().add(
           UploadCourseEvent(
             courseName: widget.courseName,
