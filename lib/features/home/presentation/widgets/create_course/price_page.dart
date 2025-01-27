@@ -1,5 +1,7 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_event.dart';
 import 'package:image_picker/image_picker.dart';
@@ -82,11 +84,11 @@ class _PricePageState extends State<PricePage> {
       );
       return;
     }
-   
+
     context.read<CreateCourseBloc>().add(
           UploadCourseEvent(
             courseName: widget.courseName,
-            courseDiscription: widget.description,  
+            courseDiscription: widget.description,
             category: widget.category,
             subCategory: widget.subCategory,
             sections: widget.sections,
@@ -95,22 +97,36 @@ class _PricePageState extends State<PricePage> {
           ),
         );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Course details saved successfully!')),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      backgroundColor: Colors.transparent,
+      behavior: SnackBarBehavior.floating,
+      elevation: 0,
+        content: AwesomeSnackbarContent(
+            title: 'Sucess',
+            message: "Course Sucessfully Added",
+            contentType: ContentType.success)));
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const BottomNavigation()),
+        (Route<dynamic> state) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: textColor,
-        automaticallyImplyLeading: true,
-        title: const Text(
-          'Course Price',
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: mainColor,
+          automaticallyImplyLeading: true,
+          iconTheme:const IconThemeData(color: textColor),
+          title: const Text(
+            'Course Price',
+            style: TextStyle(
+                fontSize: 25, fontWeight: FontWeight.bold, color: textColor),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
       ),
       backgroundColor: textColor,
       body: SingleChildScrollView(
@@ -118,13 +134,21 @@ class _PricePageState extends State<PricePage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              kheight1,
+                   const  Text('STEP -3',style: TextStyle(color: mainColor,fontWeight: FontWeight.bold,fontSize: 25),),
+                   SizedBox(height: 80,width: 150,child: Image.asset('assets/logo/tag.png'),),
+              kheight,
               Container(
                 width: 400,
                 decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  color: Color.fromARGB(255, 254, 201, 183),
-                ),
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    boxShadow: [BoxShadow(
+                      offset: Offset(0, 3),
+
+                      color: greyColor,
+                      spreadRadius: 0,
+                      blurRadius: 3
+                    )],
+                    color: textColor),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -155,6 +179,12 @@ class _PricePageState extends State<PricePage> {
                           decoration: const BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                             color: textColor,
+                             boxShadow: [BoxShadow(
+                            color: mainColor,
+                           spreadRadius: 0,
+                           blurRadius: 3,
+                            offset: Offset(0, 3)
+                          )]
                           ),
                           child: TextFormField(
                             controller: priceController,
@@ -178,6 +208,12 @@ class _PricePageState extends State<PricePage> {
                           height: 200,
                           width: 330,
                           decoration: BoxDecoration(
+                             boxShadow:const [BoxShadow(
+                            color: mainColor,
+                           spreadRadius: 0,
+                           blurRadius: 3,
+                            offset: Offset(0, 3)
+                          )],
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(20)),
                             color: textColor,

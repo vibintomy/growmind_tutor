@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/core/utils/validator.dart';
 import 'package:growmind_tutuor/features/home/presentation/widgets/create_course/price_page.dart';
+import 'package:video_player/video_player.dart';
 
 class SectionPage extends StatefulWidget {
   final String courseName;
@@ -23,19 +26,30 @@ class SectionPage extends StatefulWidget {
 }
 
 class _SectionPageState extends State<SectionPage> {
-  final List<Map<String, String>> sections = []; // Holds section data
+  final List<Map<String, String>> sections = [];
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  final List<VideoPlayerController?> videoController = [];
+
+  @override
+  void dispose() {
+    for (var controller in videoController) {
+      controller?.dispose();
+    }
+    super.dispose();
+  }
 
   void addSection() {
-    if (nameController.text.isNotEmpty && descriptionController.text.isNotEmpty) {
+    if (nameController.text.isNotEmpty &&
+        descriptionController.text.isNotEmpty) {
       setState(() {
         sections.add({
           'sectionName': nameController.text,
           'sectionDescription': descriptionController.text,
           'videoPath': '', // Placeholder for the attached video path
         });
+        videoController.add(null);
         nameController.clear();
         descriptionController.clear();
       });
@@ -52,6 +66,14 @@ class _SectionPageState extends State<SectionPage> {
     );
 
     if (result != null && result.files.isNotEmpty) {
+      final videoPath = result.files.single.path ?? '';
+      final controller = VideoPlayerController.file(File(videoPath))
+        ..initialize().then((_) {
+          setState(() {
+            sections[index]['vedioPath'] = videoPath;
+          });
+        });
+      videoController[index] = controller;
       setState(() {
         sections[index]['videoPath'] = result.files.single.path ?? '';
       });
@@ -65,20 +87,35 @@ class _SectionPageState extends State<SectionPage> {
   void removeSection(int index) {
     setState(() {
       sections.removeAt(index);
+      videoController[index]?.dispose();
+      videoController.removeAt(index);
+    });
+  }
+
+  void removeVedio(int index) {
+    setState(() {
+      sections[index]['videoPath'] = '';
+      videoController[index]?.dispose();
+      videoController[index] = null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-  
-
     return Scaffold(
-         appBar: AppBar(
-        backgroundColor: textColor,
-        automaticallyImplyLeading: true,
-
-        title:const Text('Section Details',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
-        centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: mainColor,
+          automaticallyImplyLeading: true,
+          iconTheme:const IconThemeData(color: textColor),
+          title: const Text(
+            'Section Details',
+            style: TextStyle(
+                fontSize: 25, fontWeight: FontWeight.bold, color: textColor),
+          ),
+          centerTitle: true,
+        ),
       ),
       backgroundColor: textColor,
       body: SingleChildScrollView(
@@ -88,38 +125,66 @@ class _SectionPageState extends State<SectionPage> {
             key: formKey,
             child: Column(
               children: [
-                kheight1,
+                
+                     const  Text('STEP -2',style: TextStyle(color: mainColor,fontWeight: FontWeight.bold,fontSize: 25),),
+                     SizedBox(height: 100,
+                     width: 150,
+                     child: Image.asset('assets/logo/chapter (1).png'),),
+                kheight,
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: sections.length,
                   itemBuilder: (context, index) {
                     final section = sections[index];
+                    final controller = videoController[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: const Color.fromARGB(255, 251, 213, 201),
-                        ),
+                            borderRadius: BorderRadius.circular(20),
+                            color: textColor,
+                            boxShadow: const [
+                              BoxShadow(
+                                  offset: Offset(0, 3),
+                                  spreadRadius: 0,
+                                  blurRadius: 3,
+                                  color: mainColor)
+                            ]),
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Section ${index + 1}: ${section['sectionName']}',
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Section ${index + 1}: ${section['sectionName']}',
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => removeSection(index),
+                                    icon: const Icon(Icons.delete),
+                                  )
+                                ],
                               ),
                               kheight,
-                              Text('Description: ${section['sectionDescription']}'),
-                              kheight,
                               Text(
-                                'Video: ${section['videoPath']!.isNotEmpty ? section['videoPath'] : 'No video attached'}',
-                                style: const TextStyle(
-                                    color: Color.fromARGB(255, 116, 114, 114)),
-                              ),
+                                  'Description: ${section['sectionDescription']}'),
+                              kheight,
+                              if (controller != null &&
+                                  controller.value.isInitialized)
+                                AspectRatio(
+                                  aspectRatio: controller.value.aspectRatio,
+                                  child: SizedBox(
+                                      height: 200,
+                                      width: 300,
+                                      child: VideoPlayer(controller)),
+                                ),
                               kheight,
                               Row(
                                 children: [
@@ -139,11 +204,9 @@ class _SectionPageState extends State<SectionPage> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.red,
                                       ),
-                                      onPressed: () {
-                                        setState(() {
-                                          section['videoPath'] = ''; // Clear the video path
-                                        });
-                                      },
+                                      onPressed: () => removeVedio(index),
+                                       
+                                    
                                       child: const Text(
                                         'Remove Video',
                                         style: TextStyle(color: textColor),
@@ -152,15 +215,6 @@ class _SectionPageState extends State<SectionPage> {
                                 ],
                               ),
                               kheight,
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red),
-                                onPressed: () => removeSection(index),
-                                child: const Text(
-                                  'Remove Section',
-                                  style: TextStyle(color: textColor),
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -172,9 +226,16 @@ class _SectionPageState extends State<SectionPage> {
                 Container(
                   width: 400,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: const Color.fromARGB(255, 252, 215, 202),
-                  ),
+                      borderRadius: BorderRadius.circular(30),
+                      color: textColor,
+                      boxShadow: const [
+                        BoxShadow(
+                          offset: Offset(0, 3),
+                          color: greyColor,
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                        )
+                      ]),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -194,18 +255,23 @@ class _SectionPageState extends State<SectionPage> {
                               hintText: 'Section Name',
                               border: OutlineInputBorder(),
                               focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: mainColor))),
+                                  borderSide: BorderSide(
+                                      color:
+                                          Color.fromARGB(255, 249, 179, 27)))),
                         ),
                         kheight,
                         TextFormField(
                           controller: descriptionController,
                           maxLines: 3,
                           decoration: const InputDecoration(
-                            fillColor: textColor,
-                            filled: true,
-                            hintText: 'Section Description',
-                            border: OutlineInputBorder(),
-                          ),
+                              fillColor: textColor,
+                              filled: true,
+                              hintText: 'Section Description',
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color:
+                                          Color.fromARGB(255, 249, 179, 27)))),
                         ),
                         kheight,
                         ElevatedButton(

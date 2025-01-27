@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
-import 'package:growmind_tutuor/features/home/presentation/pages/create_course_page.dart';
 import 'package:growmind_tutuor/features/home/presentation/widgets/create_course/creation_page.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_event.dart';
@@ -217,7 +216,7 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>const CreationPage()));
+                            builder: (context) => CreationPage()));
                   },
                   child: Container(
                     height: 100,

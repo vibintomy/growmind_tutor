@@ -5,6 +5,7 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_event.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_state.dart';
+import 'package:growmind_tutuor/features/profile/presentation/pages/update_page.dart';
 import 'package:growmind_tutuor/features/profile/presentation/widgets/alert_box.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -14,7 +15,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final profileBloc = context.read<ProfileBloc>();
-    profileBloc.add(LoadProfileEvent(user!.uid??''));
+    profileBloc.add(LoadProfileEvent(user!.uid ?? ''));
     if (user == null) {
       print('No user currently logged in');
     }
@@ -78,17 +79,28 @@ class ProfilePage extends StatelessWidget {
                     kheight1,
                     Column(
                       children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.person),
-                            kwidth,
-                            Text(
-                              'Edit Profile',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Spacer(),
-                            Icon(Icons.arrow_forward)
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                           
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UpdatePage(
+                                       
+                                        )));
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(Icons.person),
+                              kwidth,
+                              Text(
+                                'Edit Profile',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Spacer(),
+                              Icon(Icons.arrow_forward)
+                            ],
+                          ),
                         ),
                         kheight2,
                         const Row(

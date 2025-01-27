@@ -11,14 +11,12 @@ class ProfileRemoteDatasource {
       final DocumentSnapshot<Map<String, dynamic>> snapshot =
           await firestore.collection('tutors').doc(userId).get();
 
-    
       if (snapshot.exists && snapshot.data() != null) {
         return ProfileModel.fromFirestore(snapshot.data()!);
       } else {
         throw Exception('profile data does not exists for userId $userId');
       }
     } catch (e) {
-     
       throw Exception('Failed to fetch profile: $e');
     }
   }
@@ -34,6 +32,7 @@ class ProfileRemoteDatasource {
     };
     if (profileImage != null) {
       data['profileImage'] = profileImage;
+      
     }
     await firestore.collection('tutors').doc(userId).update(data);
   }

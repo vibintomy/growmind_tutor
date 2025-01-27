@@ -14,10 +14,14 @@ import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verificatio
 import 'package:growmind_tutuor/features/auth/presentation/pages/login_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/splash_screen.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dart';
+import 'package:growmind_tutuor/features/profile/domain/usecases/update_profile_usecases.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_update_bloc/bloc/profile_update_bloc.dart';
 
 
 void main() async {
@@ -56,7 +60,9 @@ class MyApp extends StatelessWidget {
               ),
               // BlocProvider(create: (context)=> ProfileBloc(getIt<GetProfile>(), getIt<ProfileRepo>()),child: HomePage(),),
                  BlocProvider(create: (context)=> ProfileBloc(getIt<GetProfile>(),)),
-               BlocProvider(create: (context)=> CreateCourseBloc(getIt<UploadCourseUsecases>()))
+               BlocProvider(create: (context)=> CreateCourseBloc(getIt<UploadCourseUsecases>())),
+               BlocProvider(create: (context)=> FetchCategoryBloc(getIt<FetchCategories>(), getIt<FetchSubCategories>())),
+               BlocProvider(create: (context)=>ProfileUpdateBloc(getIt<UpdateProfileUsecases>()))
                  
             ],
             child: MaterialApp(
