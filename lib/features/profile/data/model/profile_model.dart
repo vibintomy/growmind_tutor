@@ -3,18 +3,30 @@ class ProfileModel {
   String displayName;
   String email;
   String phone;
+  String? imageUrl;
 
   ProfileModel(
-      {required this.displayName, required this.email, required this.phone,required this.id});
+      {required this.displayName,
+      required this.email,
+      required this.phone,
+      this.imageUrl,
+      required this.id});
 
   factory ProfileModel.fromFirestore(Map<String, dynamic> json) {
     return ProfileModel(
-       id: json['uid']??"",
+        id: json['uid'] ?? "",
         displayName: json['displayName'] ?? "",
         email: json['email'] ?? "",
-        phone: json['phone'] ?? "");
+        phone: json['phone'] ?? "",
+        imageUrl: json['imageUrl']??"");
   }
   Map<String, dynamic> toJson() {
-    return {id:'uid','displayName': displayName, 'email': email, 'phone': phone};
+    return {
+      id: 'uid',
+      'displayName': displayName,
+      'email': email,
+      'phone': phone,
+      'imageUrl':imageUrl
+    };
   }
 }

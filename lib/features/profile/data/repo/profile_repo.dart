@@ -1,6 +1,5 @@
 
 import 'package:growmind_tutuor/features/profile/data/datasource/profile_remote_datasorce.dart';
-import 'package:growmind_tutuor/features/profile/data/model/profile_model.dart';
 import 'package:growmind_tutuor/features/profile/domain/repo/profile_repo.dart';
 
 import '../../domain/entities/profile.dart';
@@ -22,8 +21,8 @@ class ProfileRepoImpl implements ProfileRepo {
         uid: profileModel.id,
           displayName: profileModel.displayName,
           email: profileModel.email,
-          phone: profileModel.phone
-        
+          phone: profileModel.phone,
+          imageUrl: profileModel.imageUrl,
           );
     } catch (e) {
       print('Error getting profile: $e');

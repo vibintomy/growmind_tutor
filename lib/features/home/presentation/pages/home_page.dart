@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
+import 'package:growmind_tutuor/features/home/presentation/pages/monetization_page.dart';
 import 'package:growmind_tutuor/features/home/presentation/widgets/create_course/creation_page.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_event.dart';
@@ -58,8 +59,8 @@ class HomePage extends StatelessWidget {
                                 ),
                                 child: IconButton(
                                     onPressed: () {},
-                                    icon:
-                                        const Icon(Icons.notifications_outlined)),
+                                    icon: const Icon(
+                                        Icons.notifications_outlined)),
                               ),
                             ),
                           ],
@@ -106,8 +107,8 @@ class HomePage extends StatelessWidget {
                       ),
                       title: const Text(
                         'Course Analytics',
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       subtitle: const Text('View Statistics Relation'),
                       trailing: const Icon(
@@ -152,8 +153,8 @@ class HomePage extends StatelessWidget {
                       ),
                       title: const Text(
                         'Student Mangement',
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       subtitle: const Text('View Student List'),
                       trailing: const Icon(
@@ -165,47 +166,55 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 kheight1,
-                Container(
-                  height: 100,
-                  width: 400,
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: textColor,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 3),
-                          color: Colors.grey,
-                          blurRadius: 5,
-                        )
-                      ]),
-                  child: Center(
-                    child: ListTile(
-                      leading: Stack(
-                        children: [
-                          Container(
-                            height: 50,
-                            width: 100,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromARGB(255, 113, 142, 191),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MonetizationPage()));
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 400,
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: textColor,
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, 3),
+                            color: Colors.grey,
+                            blurRadius: 5,
+                          )
+                        ]),
+                    child: Center(
+                      child: ListTile(
+                        leading: Stack(
+                          children: [
+                            Container(
+                              height: 50,
+                              width: 100,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color.fromARGB(255, 113, 142, 191),
+                              ),
+                              child: const Icon(
+                                Icons.monetization_on,
+                                color: textColor,
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.monetization_on,
-                              color: textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      title: const Text(
-                        'Monetization Option',
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: const Text('Set Price & Other Details '),
-                      trailing: const Icon(
-                        Icons.arrow_forward,
-                        color: mainColor,
-                        size: 35,
+                          ],
+                        ),
+                        title: const Text(
+                          'Monetization Option',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: const Text('Set Price & Other Details '),
+                        trailing: const Icon(
+                          Icons.arrow_forward,
+                          color: mainColor,
+                          size: 35,
+                        ),
                       ),
                     ),
                   ),

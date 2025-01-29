@@ -8,7 +8,7 @@ class Signup {
   Signup(this.repository);
 
   Future<User> execute(
-      String email, String password, String displayName, String phone) async {
+      String email, String password, String displayName, String phone,String) async {
     try {
       final user = await repository.signup(email, password, displayName, phone);
 

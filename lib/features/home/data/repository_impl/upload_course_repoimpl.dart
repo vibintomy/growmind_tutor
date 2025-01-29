@@ -9,7 +9,7 @@ class UploadCourseRepoImpl implements UploadDataRepo {
   final FirebaseFirestore firestore;
 
   UploadCourseRepoImpl(this.cloudinary, this.firestore);
- @override
+  @override
   Future<void> uploadCourse({
     required String courseName,
     required String courseDescription,
@@ -25,7 +25,8 @@ class UploadCourseRepoImpl implements UploadDataRepo {
       List<Map<String, String>> updatedSections = [];
       for (var section in sections) {
         if (section['videoPath'] == null || section['videoPath']!.isEmpty) {
-          throw Exception('Invalid video file path for section: ${section['sectionName']}');
+          throw Exception(
+              'Invalid video file path for section: ${section['sectionName']}');
         }
 
         final videoFile = File(section['videoPath']!);
@@ -33,11 +34,10 @@ class UploadCourseRepoImpl implements UploadDataRepo {
         updatedSections.add({
           'sectionName': section['sectionName']!,
           'sectionDescription': section['sectionDescription']!,
-          'videoUrl': videoUrl, 
+          'videoUrl': videoUrl,
         });
       }
 
-    
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
         throw Exception('No user logged in');
@@ -52,10 +52,9 @@ class UploadCourseRepoImpl implements UploadDataRepo {
         'createdBy': currentUser.uid,
         'createdAt': FieldValue.serverTimestamp(),
       });
-   
 
       for (var section in updatedSections) {
-        await firestore
+        final sectionvalues = await firestore
             .collection('courses')
             .doc(courseDoc.id)
             .collection('sections')
@@ -65,15 +64,14 @@ class UploadCourseRepoImpl implements UploadDataRepo {
           'videoUrl': section['videoUrl'],
           'createdAt': FieldValue.serverTimestamp(),
         });
-     
+        await sectionvalues.update({'id': sectionvalues.id});
       }
- 
-      await courseDoc.update({'id': courseDoc.id});    
+
+      await courseDoc.update({'id': courseDoc.id});
     } catch (e) {
       throw Exception('Firestore error: $e');
     }
   }
-
 
   @override
   Future<void> uploadSection({
@@ -83,10 +81,9 @@ class UploadCourseRepoImpl implements UploadDataRepo {
     required String vedioFilePath,
   }) async {
     try {
-    
       final videoFile = File(vedioFilePath);
       final videoUrl = await cloudinary.uploadVideo(videoFile);
-      await firestore
+        await firestore
           .collection('courses')
           .doc(courseId)
           .collection('sections')
@@ -95,7 +92,8 @@ class UploadCourseRepoImpl implements UploadDataRepo {
         'sectionDescription': sectionDescription,
         'videoUrl': videoUrl,
         'createdAt': FieldValue.serverTimestamp(),
-      }); 
+      });
+     
     } catch (e) {
       throw Exception('Error uploading section: $e');
     }

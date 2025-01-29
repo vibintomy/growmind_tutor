@@ -25,8 +25,9 @@ class ProfileUpdateBloc extends Bloc<ProfileUpdateEvent, ProfileUpdateState> {
             name: event.name,
             phone: event.number,
             imageUrl: event.imageUrl);
-     
+
         emit(ProfileUpdated());
+        print('you are successfully added the data');
       } catch (e) {
         throw Exception('Error while updating profile');
       }

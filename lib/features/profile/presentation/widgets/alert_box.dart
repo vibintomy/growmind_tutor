@@ -35,14 +35,14 @@ GestureDetector alertBox(BuildContext context) {
     },
     child: const Row(
       children: [
-        Icon(Icons.logout),
+        Icon(Icons.logout,color: Colors.red,),
         kwidth,
         Text(
           'Log Out',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Spacer(),
-        Icon(Icons.arrow_forward),
+        Icon(Icons.arrow_right),
       ],
     ),
   );
