@@ -40,8 +40,6 @@ class FetchCourseRepoimpl extends FetchCourseRepo {
       }
       return courses;
     } catch (e, stackTrace) {
-      print('Error fetching courses $e');
-      print('stackTrace : $stackTrace');
       throw Exception('Error fetching course');
     }
   }

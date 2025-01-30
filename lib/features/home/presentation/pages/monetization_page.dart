@@ -5,6 +5,8 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_event.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_state.dart';
+import 'package:growmind_tutuor/features/home/presentation/widgets/create_course/update_course.dart';
+
 
 class MonetizationPage extends StatelessWidget {
   const MonetizationPage({super.key});
@@ -17,10 +19,12 @@ class MonetizationPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: textColor,
       appBar: AppBar(
-        backgroundColor: textColor,
+        backgroundColor: mainColor,
+        iconTheme: const IconThemeData(color: textColor),
         title: const Text(
           'Course List',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 25, color: textColor),
         ),
         centerTitle: true,
       ),
@@ -30,8 +34,9 @@ class MonetizationPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
-              'Course',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              'My Courses',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 20, color: mainColor),
             ),
             BlocBuilder<FetchCourseBloc, CourseState>(
                 builder: (context, state) {
@@ -45,19 +50,81 @@ class MonetizationPage extends StatelessWidget {
                       itemCount: state.courses.length,
                       itemBuilder: (context, index) {
                         final course = state.courses[index];
-                        return ExpansionTile(
-                          title: Text(course.id),
-                          subtitle: Text(course.courseDescription),
-                          leading: Image.network(
-                            course.imageUrl,
-                            width: 50,
-                            height: 50,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>const UpdateCourse()));
+                          },
+                          child: SizedBox(
+                            height: 180,
+                            child: Card(
+                                color: textColor,
+                                shadowColor: greyColor,
+                                elevation: 5,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        width: 150,
+                                        height: 160,
+                                        decoration: const BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: Offset(0, 3),
+                                                  spreadRadius: 0,
+                                                  blurRadius: 3,
+                                                  color: greyColor)
+                                            ],
+                                            shape: BoxShape.rectangle,
+                                            color: greyColor,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(1))),
+                                        child: Image.network(
+                                          course.imageUrl,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: [
+                                            kheight2,
+                                            kwidth1,
+                                            Text(
+                                              course.subCategory,
+                                              style: const TextStyle(
+                                                  color: textColor1,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            kheight1,
+                                            Text(
+                                              course.courseName,
+                                              style: const TextStyle(
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              'Price - ${course.coursePrice}-/',
+                                              style: const TextStyle(
+                                                  color: mainColor,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                )),
                           ),
-                          children: course.sections.map((section) {
-                            return ListTile(
-                              title: Text(section.sectionName),
-                            );
-                          }).toList(),
                         );
                       }),
                 );

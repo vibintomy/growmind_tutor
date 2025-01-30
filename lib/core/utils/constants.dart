@@ -23,3 +23,6 @@ const kwidth1 = SizedBox(
 const mainColor = Color(0xFFC82C55);
 const textColor = Colors.white;
 const greyColor = Colors.grey;
+
+const  Color textColor1 = Color(0xFFFF6B00);
+const twitterBlue =  Color(0xFF1DA1F2);

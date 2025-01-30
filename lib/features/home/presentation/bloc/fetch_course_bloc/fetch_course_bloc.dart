@@ -11,7 +11,7 @@ class FetchCourseBloc extends Bloc<CourseEvent, CourseState> {
       try {
         final course = await fetchCourseUsecases.call(event.tutorId);
         emit(CourseLoaded(course));
-      } catch (e,stackTree) {
+      } catch (e) {
         emit(CourseError(e.toString()));
       }
     });
