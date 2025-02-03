@@ -85,4 +85,5 @@ void setup() {
   getIt
       .registerFactory(() => ProfileUpdateBloc(getIt<UpdateProfileUsecases>()));
   getIt.registerFactory(() => FetchCourseBloc(getIt<FetchCourseUsecases>()));
+
 }

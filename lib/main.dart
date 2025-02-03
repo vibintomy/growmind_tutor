@@ -14,12 +14,14 @@ import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verificatio
 import 'package:growmind_tutuor/features/auth/presentation/pages/login_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/splash_screen.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
+import 'package:growmind_tutuor/features/home/domain/entities/section_entity.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/update_section_course_bloc/bloc/update_section_bloc.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/update_profile_usecases.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
@@ -65,7 +67,8 @@ class MyApp extends StatelessWidget {
                BlocProvider(create: (context)=> CreateCourseBloc(getIt<UploadCourseUsecases>())),
                BlocProvider(create: (context)=> FetchCategoryBloc(getIt<FetchCategories>(), getIt<FetchSubCategories>())),
                BlocProvider(create: (context)=>ProfileUpdateBloc(getIt<UpdateProfileUsecases>())),
-              BlocProvider(create: (context)=> FetchCourseBloc(getIt<FetchCourseUsecases>()))
+              BlocProvider(create: (context)=> FetchCourseBloc(getIt<FetchCourseUsecases>())),
+              BlocProvider(create: (context)=> UpdateSectionBloc([])),
             ],
             child: MaterialApp(
               theme: ThemeData(

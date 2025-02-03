@@ -5,7 +5,7 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_event.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_state.dart';
-import 'package:growmind_tutuor/features/home/presentation/widgets/create_course/update_course.dart';
+import 'package:growmind_tutuor/features/home/presentation/pages/update_course.dart';
 
 
 class MonetizationPage extends StatelessWidget {
@@ -55,7 +55,7 @@ class MonetizationPage extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>const UpdateCourse()));
+                                    builder: (context) => UpdateCourse(course: course,)));
                           },
                           child: SizedBox(
                             height: 180,
