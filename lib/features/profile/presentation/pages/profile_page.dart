@@ -31,6 +31,7 @@ class ProfilePage extends StatelessWidget {
                   color: textColor),
             ) ,
             centerTitle: true,
+            automaticallyImplyLeading: false,
             ),
       ),
           
