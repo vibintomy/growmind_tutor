@@ -31,6 +31,7 @@ class _SectionPageState extends State<SectionPage> {
   final TextEditingController descriptionController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final List<VideoPlayerController?> videoController = [];
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -61,6 +62,7 @@ class _SectionPageState extends State<SectionPage> {
   }
 
   void pickVideo(int index) async {
+    isLoading.value = true;
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.video,
     );
@@ -71,6 +73,7 @@ class _SectionPageState extends State<SectionPage> {
         ..initialize().then((_) {
           setState(() {
             sections[index]['vedioPath'] = videoPath;
+            isLoading.value = false;
           });
         });
       videoController[index] = controller;
@@ -78,6 +81,7 @@ class _SectionPageState extends State<SectionPage> {
         sections[index]['videoPath'] = result.files.single.path ?? '';
       });
     } else {
+      isLoading.value = false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No video selected')),
       );
@@ -108,7 +112,7 @@ class _SectionPageState extends State<SectionPage> {
         child: AppBar(
           backgroundColor: mainColor,
           automaticallyImplyLeading: true,
-          iconTheme:const IconThemeData(color: textColor),
+          iconTheme: const IconThemeData(color: textColor),
           title: const Text(
             'Section Details',
             style: TextStyle(
@@ -125,11 +129,18 @@ class _SectionPageState extends State<SectionPage> {
             key: formKey,
             child: Column(
               children: [
-                
-                     const  Text('STEP -2',style: TextStyle(color: mainColor,fontWeight: FontWeight.bold,fontSize: 25),),
-                     SizedBox(height: 100,
-                     width: 150,
-                     child: Image.asset('assets/logo/chapter (1).png'),),
+                const Text(
+                  'STEP -2',
+                  style: TextStyle(
+                      color: mainColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25),
+                ),
+                SizedBox(
+                  height: 100,
+                  width: 150,
+                  child: Image.asset('assets/logo/chapter (1).png'),
+                ),
                 kheight,
                 ListView.builder(
                   shrinkWrap: true,
@@ -205,8 +216,6 @@ class _SectionPageState extends State<SectionPage> {
                                         backgroundColor: Colors.red,
                                       ),
                                       onPressed: () => removeVedio(index),
-                                       
-                                    
                                       child: const Text(
                                         'Remove Video',
                                         style: TextStyle(color: textColor),

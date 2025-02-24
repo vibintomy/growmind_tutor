@@ -133,7 +133,7 @@ class ProfilePage extends StatelessWidget {
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               Spacer(),
-                              Icon(Icons.arrow_right)
+                              Icon(Icons.arrow_right,color: mainColor,)
                             ],
                           ),
                         ),
@@ -147,7 +147,7 @@ class ProfilePage extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Spacer(),
-                            Icon(Icons.arrow_right)
+                            Icon(Icons.arrow_right,color: mainColor,)
                           ],
                         ),
                         kheight2,
@@ -160,7 +160,7 @@ class ProfilePage extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Spacer(),
-                            Icon(Icons.arrow_right)
+                            Icon(Icons.arrow_right,color: mainColor,)
                           ],
                         ),
                         kheight2,
@@ -173,7 +173,7 @@ class ProfilePage extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Spacer(),
-                            Icon(Icons.arrow_right)
+                            Icon(Icons.arrow_right,color: mainColor,)
                           ],
                         ),
                         kheight2,
@@ -186,7 +186,7 @@ class ProfilePage extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Spacer(),
-                            Icon(Icons.arrow_right)
+                            Icon(Icons.arrow_right,color: mainColor,)
                           ],
                         ),
                         kheight2,

@@ -50,6 +50,7 @@ dependencies:
   uuid: ^4.5.1
   video_player: ^2.9.2
   chewie: ^1.10.0
+  flutter_hooks: ^0.20.5
 
 
   # The following adds the Cupertino Icons font to your application.

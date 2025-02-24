@@ -22,7 +22,7 @@ GestureDetector alertBox(BuildContext context) {
                     },
                     child: const Text(
                       'Yes',
-                      style: TextStyle(color: mainColor),
+                      style: TextStyle(color: secondaryColor),
                     )),
                 TextButton(
                     onPressed: () {
@@ -42,7 +42,7 @@ GestureDetector alertBox(BuildContext context) {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Spacer(),
-        Icon(Icons.arrow_right),
+        Icon(Icons.arrow_right,color: mainColor,),
       ],
     ),
   );

@@ -19,8 +19,8 @@ const kwidth1 = SizedBox(
 );
 
 //  color section
-
-const mainColor = Color(0xFFC82C55);
+const secondaryColor = Color(0xFFC82C55);
+const mainColor = Color(0xFF1F74BA);
 const textColor = Colors.white;
 const greyColor = Colors.grey;
 

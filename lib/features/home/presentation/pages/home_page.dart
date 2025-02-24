@@ -195,7 +195,7 @@ class HomePage extends StatelessWidget {
                               width: 100,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Color.fromARGB(255, 113, 142, 191),
+                                color: secondaryColor,
                               ),
                               child: const Icon(
                                 Icons.monetization_on,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
-import 'package:growmind_tutuor/features/chat/chat_page.dart';
+import 'package:growmind_tutuor/features/chat/presentation/pages/chat_page.dart';
 import 'package:growmind_tutuor/features/home/presentation/pages/home_page.dart';
 import 'package:growmind_tutuor/features/profile/presentation/pages/profile_page.dart';
 
