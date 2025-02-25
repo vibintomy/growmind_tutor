@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:growmind_tutuor/features/chat/domain/entities/chat_entities.dart';
-
+import 'package:growmind_tutuor/features/chat/domain/domain/entities/chat_entities.dart';
 
 abstract class ChatEvent extends Equatable {
   ChatEvent();
@@ -9,17 +8,20 @@ abstract class ChatEvent extends Equatable {
 }
 
 class LoadMessages extends ChatEvent {
-  final String receiverId;
-  final String senderId;
-  LoadMessages(this.receiverId, this.senderId);
+  final String tutorId;
+  final String studentId;
+  LoadMessages(this.tutorId, this.studentId);
 
   @override
-  List<Object?> get props => [receiverId,senderId];
+  List<Object?> get props => [tutorId, studentId];
 }
 
 class SendMessages extends ChatEvent {
-  final Message message;
-  SendMessages(this.message);
+  final String message;
+  final String tutorId;
+  final String studentId;
+
+  SendMessages(this.message,this.tutorId,this.studentId);
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message,tutorId,studentId];
 }

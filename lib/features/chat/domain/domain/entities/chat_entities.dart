@@ -1,6 +1,6 @@
-import 'package:equatable/equatable.dart';
 
-class Message extends Equatable {
+
+class Message  {
   final String senderId;
   final String receiverId;
   final String message;
@@ -12,6 +12,4 @@ class Message extends Equatable {
       required this.message,
       required this.timeStamp});
 
-      @override  
-      List<Object?> get props => [senderId,receiverId,message,timeStamp];
 }

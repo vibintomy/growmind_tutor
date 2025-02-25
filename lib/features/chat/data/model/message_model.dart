@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:growmind_tutuor/features/chat/domain/entities/chat_entities.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/entities/chat_entities.dart';
 
 
 class MessageModel extends Message {

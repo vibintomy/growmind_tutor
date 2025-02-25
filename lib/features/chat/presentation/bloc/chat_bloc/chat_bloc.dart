@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:growmind_tutuor/features/chat/domain/entities/chat_entities.dart';
-import 'package:growmind_tutuor/features/chat/domain/usecases/chat_usecases.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/entities/chat_entities.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_message_usecase.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_event.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_state.dart';
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
-import 'package:growmind_tutuor/features/chat/domain/entities/chat_entities.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/entities/chat_entities.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_event.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_state.dart';
