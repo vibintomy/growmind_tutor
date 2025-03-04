@@ -5,18 +5,33 @@ import 'package:growmind_tutuor/features/auth/data/repository/tutor_repository_i
 import 'package:growmind_tutuor/features/auth/domain/repositories/tutor_repositories.dart';
 import 'package:growmind_tutuor/features/auth/domain/usecases/kyc_usecases.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/kyc_bloc/kyc_bloc.dart';
+import 'package:growmind_tutuor/features/chat/data/datasource/chat_remote_datasource.dart';
+import 'package:growmind_tutuor/features/chat/data/datasource/chat_remote_datasource_impl.dart';
+import 'package:growmind_tutuor/features/chat/data/repositories/chat_repo_impl.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/repo/chat_repositories.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_TutorConversation.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_message_students.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_send_message.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_student_info.dart';
+import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
+import 'package:growmind_tutuor/features/chat/presentation/bloc/conversation_bloc/conversation_bloc.dart';
+import 'package:growmind_tutuor/features/home/data/data_source/saled_course_datasource.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/fetch_category_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/fetch_course_repoimpl.dart';
+import 'package:growmind_tutuor/features/home/data/repository_impl/saled_course_repo_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/upload_course_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_category_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_course_repo.dart';
+import 'package:growmind_tutuor/features/home/domain/repository/saled_course_repostory.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/upload_course_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_course_usecases.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/get_saled_course_usecase.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/sales_course_bloc/sales_course_bloc.dart';
 import 'package:growmind_tutuor/features/profile/data/datasource/profile_remote_datasorce.dart';
 import 'package:growmind_tutuor/features/profile/data/repo/profile_repo.dart';
 import 'package:growmind_tutuor/features/profile/data/repo/update_profile_repImpl.dart';
@@ -26,7 +41,6 @@ import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dar
 import 'package:growmind_tutuor/features/profile/domain/usecases/update_profile_usecases.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_update_bloc/bloc/profile_update_bloc.dart';
-
 
 final getIt = GetIt.instance;
 
@@ -56,6 +70,14 @@ void setup() {
       UpdateProfileRepimpl(getIt<Cloudinary>(), getIt<FirebaseFirestore>()));
   getIt.registerLazySingleton<FetchCourseRepo>(
       () => FetchCourseRepoimpl(getIt<FirebaseFirestore>()));
+  getIt.registerLazySingleton<ChatRemoteDatasource>(
+      () => ChatRemotDatasourceimpl(getIt<FirebaseFirestore>()));
+  getIt.registerLazySingleton<ChatRepositories>(
+      () => ChatRepoImpl(getIt<ChatRemoteDatasource>()));
+  getIt.registerLazySingleton<SaledCourseDatasource>(
+      () => SaledCourseDatasource(getIt<FirebaseFirestore>()));
+  getIt.registerLazySingleton<SaledCourseRepostory>(
+      () => SaledCourseRepoImpl(getIt<SaledCourseDatasource>()));
   // Domain Layer
   getIt.registerLazySingleton(
       () => UploadPDFUseCase(getIt<TutorRepositories>()));
@@ -73,6 +95,15 @@ void setup() {
       () => UpdateProfileUsecases(getIt<UpdateProfileRepo>()));
   getIt.registerLazySingleton(
       () => FetchCourseUsecases(getIt<FetchCourseRepo>()));
+  getIt.registerLazySingleton(() => GetSendMessage(getIt<ChatRepositories>()));
+  getIt.registerLazySingleton(
+      () => GetMessageStudents(getIt<ChatRepositories>()));
+  getIt.registerLazySingleton(
+      () => GetTutorconversation(getIt<ChatRepositories>()));
+  getIt.registerLazySingleton(
+      () => GetStudentProfile(getIt<ChatRepositories>()));
+  getIt
+      .registerLazySingleton(() => GetSaledCourseUsecase(getIt<SaledCourseRepostory>()));
   // Presentation Layer
   getIt.registerFactory(() => TutorKycBloc(
         uploadPDFUseCase: getIt<UploadPDFUseCase>(),
@@ -85,5 +116,12 @@ void setup() {
   getIt
       .registerFactory(() => ProfileUpdateBloc(getIt<UpdateProfileUsecases>()));
   getIt.registerFactory(() => FetchCourseBloc(getIt<FetchCourseUsecases>()));
+  getIt.registerFactory(() => ChatBloc(
+      getMessageWithStudents: getIt<GetMessageStudents>(),
+      sendMessage: getIt<GetSendMessage>()));
 
+  getIt.registerFactory(() => ConversationBloc(
+      getTutorConversations: getIt<GetTutorconversation>(),
+      getStudentProfile: getIt<GetStudentProfile>()));
+  getIt.registerFactory(() => SalesCourseBloc(getIt<GetSaledCourseUsecase>()));
 }

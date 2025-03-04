@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
+import 'package:growmind_tutuor/features/home/presentation/pages/course_analytics.dart';
 import 'package:growmind_tutuor/features/home/presentation/pages/monetization_page.dart';
 import 'package:growmind_tutuor/features/home/presentation/widgets/create_course/creation_page.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
@@ -74,47 +75,55 @@ class HomePage extends StatelessWidget {
                       color: Color.fromARGB(255, 112, 110, 110)),
                 ),
                 kheight1,
-                Container(
-                  height: 100,
-                  width: 400,
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: textColor,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 3),
-                          color: Colors.grey,
-                          blurRadius: 5,
-                        )
-                      ]),
-                  child: Center(
-                    child: ListTile(
-                      leading: Stack(
-                        children: [
-                          Container(
-                            height: 50,
-                            width: 100,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.green,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CourseAnalytics()));
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 400,
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: textColor,
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0, 3),
+                            color: Colors.grey,
+                            blurRadius: 5,
+                          )
+                        ]),
+                    child: Center(
+                      child: ListTile(
+                        leading: Stack(
+                          children: [
+                            Container(
+                              height: 50,
+                              width: 100,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.green,
+                              ),
+                              child: const Icon(
+                                Icons.show_chart,
+                                color: textColor,
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.show_chart,
-                              color: textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      title: const Text(
-                        'Course Analytics',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: const Text('View Statistics Relation'),
-                      trailing: const Icon(
-                        Icons.arrow_forward,
-                        color: mainColor,
-                        size: 35,
+                          ],
+                        ),
+                        title: const Text(
+                          'Course Analytics',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: const Text('View Statistics Relation'),
+                        trailing: const Icon(
+                          Icons.arrow_forward,
+                          color: mainColor,
+                          size: 35,
+                        ),
                       ),
                     ),
                   ),

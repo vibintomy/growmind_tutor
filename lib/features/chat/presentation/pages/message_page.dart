@@ -3,57 +3,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:growmind_tutuor/core/utils/constants.dart';
-import 'package:growmind_tutuor/features/chat/domain/domain/entities/chat_entities.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_event.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_state.dart';
 import 'package:intl/intl.dart';
 
-class MessagePage extends HookWidget {  // Changed to HookWidget
+class MessagePage extends HookWidget {
+  final String studentId;
   final String name;
   final String imageUrl;
-  final String receiverId;
 
   const MessagePage({
     super.key,
+    required this.studentId,
     required this.imageUrl,
     required this.name,
-    required this.receiverId,
   });
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser;
+    final tutorId = userId!.uid;
     final messageController = useTextEditingController();
     final scrollController = useScrollController();
-    
+
+
+    void scrollToBottom() {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    }
+
     // Hook for initialization
     useEffect(() {
-      final userId = FirebaseAuth.instance.currentUser;
-      context.read<ChatBloc>().add(LoadMessages(receiverId, userId!.uid));
-      return null;
-    }, []);
+      context.read<ChatBloc>().add(LoadMessages(studentId, tutorId));
+      return () {
+        messageController.dispose();
+      };
+    }, [studentId, tutorId]);
 
     void sendMessage() {
-      final userId = FirebaseAuth.instance.currentUser;
       final text = messageController.text.trim();
       if (text.isNotEmpty) {
-        final message = Message(
-          senderId: userId!.uid,
-          receiverId: receiverId,
-          timeStamp: DateTime.now(),
-          message: text,
-        );
+        context.read<ChatBloc>().add(SendMessages(
+            message: text, tutorId: tutorId, studentId: studentId));
 
-        context.read<ChatBloc>().add(SendMessages(message));
         messageController.clear();
 
-        Future.delayed(const  Duration(milliseconds: 300), () {
-          scrollController.animateTo(
-            scrollController.position.maxScrollExtent + 100,
-            duration:const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        });
+        Future.delayed(const Duration(milliseconds: 300), scrollToBottom);
       }
     }
 
@@ -89,67 +90,42 @@ class MessagePage extends HookWidget {  // Changed to HookWidget
           ],
         ),
       ),
-      body: BlocBuilder<ChatBloc, ChatState>(
-        builder: (context, state) {
-          if (state is ChatLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is ChatLoaded) {
-            final messages = state.message;
-
-            return Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/logo/download.jpg'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: messages.length,
-                reverse: false,
-                padding:const EdgeInsets.only(bottom: 80),
-                itemBuilder: (context, index) {
-                  final message = messages[index];
-                  final isMe = message.senderId == receiverId;
-
-                  return Align(
-                    alignment: isMe ? Alignment.centerLeft : Alignment.centerRight,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: isMe ? Colors.grey[300] : mainColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            message.message,
-                            style: TextStyle(
-                              color: isMe ? Colors.black : Colors.white,
-                            ),
-                          ),
-                          Text(
-                            DateFormat.Hm() .format(DateTime.parse(message.timeStamp.toString()))
-                          )
-                        ],
-                      ),
-                    ),
+      body: Column(
+        children: [
+          Expanded(
+            child: BlocConsumer<ChatBloc, ChatState>(
+              listener: (context, state) {
+                if (state is ChatError) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Error : ${state.failure.message}')));
+                }
+                // Scroll to bottom when new messages are loaded
+                if (state is ChatLoaded) {
+                  Future.delayed(const Duration(milliseconds: 300), scrollToBottom);
+                }
+              },
+              builder: (context, state) {
+                if (state is ChatLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                },
-              ),
-            );
-          } else {
-            return const Center(
-              child: Text('No messages found'),
-            );
-          }
-        },
+                } else if (state is ChatLoaded) {
+                  return chatUi(context, scrollController, state, tutorId);
+                } else if (state is MessageSending || state is MessageSent) {
+                  if (state is ChatLoaded) {
+                    return chatUi(context, scrollController, state, tutorId);
+                  }
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return const Center(
+                  child: Text('No messages yet'),
+                );
+              },
+            ),
+          )
+        ],
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 8),
@@ -163,28 +139,89 @@ class MessagePage extends HookWidget {  // Changed to HookWidget
                   decoration: InputDecoration(
                     hintText: 'Type a message...',
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: textColor,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                      borderRadius: BorderRadius.circular(20)
+                    )
                   ),
-                ),
+                  // Enable sending message on Enter key
+                  onSubmitted: (_) => sendMessage(),
+                )
               ),
               kwidth,
               Container(
                 height: 50,
                 width: 50,
-                decoration:const BoxDecoration(
-                  color: textColor,
+                decoration: const BoxDecoration(
+                  color: textColor, 
                   shape: BoxShape.circle
                 ),
                 child: IconButton(
                   onPressed: sendMessage,
-                  icon: const Icon(Icons.send, color: mainColor),
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.blue,
+                  )
                 ),
-              ),
+              )
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Padding chatUi(BuildContext context, ScrollController scrollController,
+      ChatLoaded state, String tutorId) {
+    // Sort messages by timestamp to ensure correct chronological order
+    final sortedMessages = List.from(state.message);
+    sortedMessages.sort((a, b) => a.timeStamp.millisecondsSinceEpoch
+        .compareTo(b.timeStamp.millisecondsSinceEpoch));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 90),
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/logo/telegrame background 🩷🥹.jpeg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: ListView.builder(
+          controller: scrollController,
+          itemCount: sortedMessages.length,
+          itemBuilder: (context, index) {
+            final message = sortedMessages[index];
+            final isMe = message.senderId == tutorId;
+            return Align(
+              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isMe ? Colors.blue[100] : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(message.message),
+                    kheight,
+                    Text(
+                      DateFormat('HH:mm').format(
+                        DateTime.fromMillisecondsSinceEpoch(
+                          message.timeStamp.millisecondsSinceEpoch
+                        )
+                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

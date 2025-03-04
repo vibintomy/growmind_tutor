@@ -11,15 +11,20 @@ class ChatRepoImpl implements ChatRepositories {
   ChatRepoImpl(this.chatRemoteDatasource);
 
   @override
-  Stream<Either<Failure, List<Conversation>>> getTutorConversation(
-      String tutorId)  {
-    return chatRemoteDatasource
-        .getConversation(tutorId)
-        .map((conversation) => Right<Failure, List<Conversation>>(conversation))
-        .handleError((error) {
-      return Left<Failure, List<Conversation>>(ServerFailure(error));
-    });
-  }
+ @override
+Stream<Either<Failure, List<Conversation>>> getTutorConversation(String tutorId) {
+  print("DEBUG REPO: Getting conversations for tutorId: $tutorId");
+  return chatRemoteDatasource
+      .getConversation(tutorId)
+      .map((conversation) {
+        print("DEBUG REPO: Received ${conversation.length} conversations");
+        return Right<Failure, List<Conversation>>(conversation);
+      })
+      .handleError((error) {
+        print("DEBUG REPO: Error in conversations stream: $error");
+        return Left<Failure, List<Conversation>>(ServerFailure(error.toString()));
+      });
+}
    @override
   Stream<Either<Failure, List<Message>>> getMessage(String tutorId, String studentId) {
     return chatRemoteDatasource.getMessages(tutorId, studentId)

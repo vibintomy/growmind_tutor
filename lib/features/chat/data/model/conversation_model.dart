@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:growmind_tutuor/features/chat/domain/domain/entities/conversation.dart';
 
 class ConversationModel extends Conversation {
@@ -24,7 +25,8 @@ class ConversationModel extends Conversation {
       chatRoomId: json['chatRoomId'] ?? '',
       studentId: studentId,
       lastMessage: json['lastMessage'] ?? '',
-      lastMessageTime: json['lastMessageTime'] ?? 0,
+      lastMessageTime: (json['lastMessageTime'] is Timestamp)
+      ?(json['lastMessageTime']as Timestamp).millisecondsSinceEpoch :(json['lastMessageTime']?? 0)
     );
   }
 }

@@ -14,13 +14,20 @@ import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verificatio
 import 'package:growmind_tutuor/features/auth/presentation/pages/login_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/splash_screen.dart';
 import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
-import 'package:growmind_tutuor/features/home/domain/entities/section_entity.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_TutorConversation.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_message_students.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_send_message.dart';
+import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_student_info.dart';
+import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
+import 'package:growmind_tutuor/features/chat/presentation/bloc/conversation_bloc/conversation_bloc.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_course_usecases.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/get_saled_course_usecase.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/sales_course_bloc/sales_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/update_section_course_bloc/bloc/update_section_bloc.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/update_profile_usecases.dart';
@@ -69,6 +76,9 @@ class MyApp extends StatelessWidget {
                BlocProvider(create: (context)=>ProfileUpdateBloc(getIt<UpdateProfileUsecases>())),
               BlocProvider(create: (context)=> FetchCourseBloc(getIt<FetchCourseUsecases>())),
               BlocProvider(create: (context)=> UpdateSectionBloc([])),
+              BlocProvider(create: (context)=> ChatBloc(getMessageWithStudents: getIt<GetMessageStudents>(), sendMessage:getIt<GetSendMessage>() )),
+              BlocProvider(create: (context)=> ConversationBloc(getTutorConversations: getIt<GetTutorconversation>(), getStudentProfile: getIt<GetStudentProfile>())),
+              BlocProvider(create: (context)=> SalesCourseBloc(getIt<GetSaledCourseUsecase>()))
             ],
             child: MaterialApp(
               theme: ThemeData(

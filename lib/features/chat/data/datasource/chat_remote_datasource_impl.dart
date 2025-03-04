@@ -44,13 +44,13 @@ class ChatRemotDatasourceimpl implements ChatRemoteDatasource {
   @override
   Future<void> sendMessage(
       String tutorId, String studentId, String message) async {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final timestamp = DateTime.now();
     final messageModel = MessageModel(
         id: '',
         senderId: tutorId,
         receiverId: studentId,
         message: message,
-        timeStamp: timestamp as DateTime);
+        timeStamp: timestamp );
     final chatRoomId = getChatRoomId(tutorId, studentId);
     await firestore
         .collection('chat')
