@@ -16,22 +16,28 @@ import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_student
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/conversation_bloc/conversation_bloc.dart';
 import 'package:growmind_tutuor/features/home/data/data_source/saled_course_datasource.dart';
+import 'package:growmind_tutuor/features/home/data/data_source/student_datasource.dart';
+import 'package:growmind_tutuor/features/home/data/data_source/student_datasource_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/fetch_category_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/fetch_course_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/saled_course_repo_impl.dart';
+import 'package:growmind_tutuor/features/home/data/repository_impl/student_repo_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/upload_course_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_category_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_course_repo.dart';
+import 'package:growmind_tutuor/features/home/domain/repository/fetch_student_repositories.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/saled_course_repostory.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/upload_course_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_course_usecases.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/fetch_student_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/get_saled_course_usecase.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/sales_course_bloc/sales_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/student_bloc/student_bloc.dart';
 import 'package:growmind_tutuor/features/profile/data/datasource/profile_remote_datasorce.dart';
 import 'package:growmind_tutuor/features/profile/data/repo/profile_repo.dart';
 import 'package:growmind_tutuor/features/profile/data/repo/update_profile_repImpl.dart';
@@ -78,6 +84,10 @@ void setup() {
       () => SaledCourseDatasource(getIt<FirebaseFirestore>()));
   getIt.registerLazySingleton<SaledCourseRepostory>(
       () => SaledCourseRepoImpl(getIt<SaledCourseDatasource>()));
+  getIt.registerLazySingleton<StudentDatasource>(
+      () => StudentDatasourceImpl(getIt<FirebaseFirestore>()));
+  getIt.registerLazySingleton<FetchStudentRepositories>(
+      () => StudentRepoImpl(getIt<StudentDatasource>()));
   // Domain Layer
   getIt.registerLazySingleton(
       () => UploadPDFUseCase(getIt<TutorRepositories>()));
@@ -102,8 +112,10 @@ void setup() {
       () => GetTutorconversation(getIt<ChatRepositories>()));
   getIt.registerLazySingleton(
       () => GetStudentProfile(getIt<ChatRepositories>()));
-  getIt
-      .registerLazySingleton(() => GetSaledCourseUsecase(getIt<SaledCourseRepostory>()));
+  getIt.registerLazySingleton(
+      () => GetSaledCourseUsecase(getIt<SaledCourseRepostory>()));
+  getIt.registerLazySingleton(
+      () => FetchStudentUsecases(getIt<FetchStudentRepositories>()));
   // Presentation Layer
   getIt.registerFactory(() => TutorKycBloc(
         uploadPDFUseCase: getIt<UploadPDFUseCase>(),
@@ -124,4 +136,5 @@ void setup() {
       getTutorConversations: getIt<GetTutorconversation>(),
       getStudentProfile: getIt<GetStudentProfile>()));
   getIt.registerFactory(() => SalesCourseBloc(getIt<GetSaledCourseUsecase>()));
+  getIt.registerFactory(() => StudentBloc(getIt<FetchStudentUsecases>()));
 }

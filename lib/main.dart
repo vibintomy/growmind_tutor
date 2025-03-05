@@ -22,12 +22,14 @@ import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_b
 import 'package:growmind_tutuor/features/chat/presentation/bloc/conversation_bloc/conversation_bloc.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_course_usecases.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/fetch_student_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/get_saled_course_usecase.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/sales_course_bloc/sales_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/student_bloc/student_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/update_section_course_bloc/bloc/update_section_bloc.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dart';
 import 'package:growmind_tutuor/features/profile/domain/usecases/update_profile_usecases.dart';
@@ -78,7 +80,8 @@ class MyApp extends StatelessWidget {
               BlocProvider(create: (context)=> UpdateSectionBloc([])),
               BlocProvider(create: (context)=> ChatBloc(getMessageWithStudents: getIt<GetMessageStudents>(), sendMessage:getIt<GetSendMessage>() )),
               BlocProvider(create: (context)=> ConversationBloc(getTutorConversations: getIt<GetTutorconversation>(), getStudentProfile: getIt<GetStudentProfile>())),
-              BlocProvider(create: (context)=> SalesCourseBloc(getIt<GetSaledCourseUsecase>()))
+              BlocProvider(create: (context)=> SalesCourseBloc(getIt<GetSaledCourseUsecase>())),
+              BlocProvider(create: (context)=> StudentBloc(getIt<FetchStudentUsecases>()))
             ],
             child: MaterialApp(
               theme: ThemeData(
