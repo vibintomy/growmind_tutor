@@ -39,7 +39,7 @@ class FetchCourseRepoimpl extends FetchCourseRepo {
             sections: sections));
       }
       return courses;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw Exception('Error fetching course');
     }
   }

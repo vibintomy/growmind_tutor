@@ -51,5 +51,5 @@ GestureDetector alertBox(BuildContext context) {
 Future<void> logout() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove(AuthLocalDataSourceImpl.cachedUserKey);
-  print('user logged out');
+
 }

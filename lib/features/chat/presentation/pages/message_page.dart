@@ -6,6 +6,9 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_event.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_state.dart';
+import 'package:growmind_tutuor/features/home/domain/entities/notification_entities.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/notification_bloc.dart/notification_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/notification_bloc.dart/notification_event.dart';
 import 'package:intl/intl.dart';
 
 class MessagePage extends HookWidget {
@@ -27,7 +30,6 @@ class MessagePage extends HookWidget {
     final messageController = useTextEditingController();
     final scrollController = useScrollController();
 
-
     void scrollToBottom() {
       if (scrollController.hasClients) {
         scrollController.animateTo(
@@ -41,6 +43,7 @@ class MessagePage extends HookWidget {
     // Hook for initialization
     useEffect(() {
       context.read<ChatBloc>().add(LoadMessages(studentId, tutorId));
+      context.read<NotificationBloc>().add(SubscribeToUserTopic(tutorId));
       return () {
         messageController.dispose();
       };
@@ -52,6 +55,17 @@ class MessagePage extends HookWidget {
         context.read<ChatBloc>().add(SendMessages(
             message: text, tutorId: tutorId, studentId: studentId));
 
+ final notification = NotificationEntities(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            body: text,
+            title: "New message from ${userId.displayName ?? 'User'}",
+            receiverId: studentId,
+            data: {'type': messageController.text, 'messageId': messageController.text},
+            senderId: userId.uid,
+            timeStamp: DateTime.now());
+      
+        
+        context.read<NotificationBloc>().add(SendNotification(notification));
         messageController.clear();
 
         Future.delayed(const Duration(milliseconds: 300), scrollToBottom);
@@ -101,7 +115,8 @@ class MessagePage extends HookWidget {
                 }
                 // Scroll to bottom when new messages are loaded
                 if (state is ChatLoaded) {
-                  Future.delayed(const Duration(milliseconds: 300), scrollToBottom);
+                  Future.delayed(
+                      const Duration(milliseconds: 300), scrollToBottom);
                 }
               },
               builder: (context, state) {
@@ -134,35 +149,29 @@ class MessagePage extends HookWidget {
           child: Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: messageController,
-                  decoration: InputDecoration(
+                  child: TextField(
+                controller: messageController,
+                decoration: InputDecoration(
                     hintText: 'Type a message...',
                     filled: true,
                     fillColor: textColor,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20)
-                    )
-                  ),
-                  // Enable sending message on Enter key
-                  onSubmitted: (_) => sendMessage(),
-                )
-              ),
+                        borderRadius: BorderRadius.circular(20))),
+                // Enable sending message on Enter key
+                onSubmitted: (_) => sendMessage(),
+              )),
               kwidth,
               Container(
                 height: 50,
                 width: 50,
                 decoration: const BoxDecoration(
-                  color: textColor, 
-                  shape: BoxShape.circle
-                ),
+                    color: textColor, shape: BoxShape.circle),
                 child: IconButton(
-                  onPressed: sendMessage,
-                  icon: const Icon(
-                    Icons.send,
-                    color: Colors.blue,
-                  )
-                ),
+                    onPressed: sendMessage,
+                    icon: const Icon(
+                      Icons.send,
+                      color: Colors.blue,
+                    )),
               )
             ],
           ),
@@ -211,10 +220,8 @@ class MessagePage extends HookWidget {
                     kheight,
                     Text(
                       DateFormat('HH:mm').format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                          message.timeStamp.millisecondsSinceEpoch
-                        )
-                      ),
+                          DateTime.fromMillisecondsSinceEpoch(
+                              message.timeStamp.millisecondsSinceEpoch)),
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     )
                   ],

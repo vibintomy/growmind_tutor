@@ -200,7 +200,6 @@ class LoginPage extends StatelessWidget {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Fill the tables')));
     }
-    final FirebaseFirestore firestore;
 
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
@@ -221,6 +220,7 @@ class LoginPage extends StatelessWidget {
       final querySnapshot =
           await kycCollection.where('vemail', isEqualTo: email).limit(1).get();
       if (querySnapshot.docs.isEmpty) {
+         // ignore: use_build_context_synchronously
          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               elevation: 0,
                               behavior: SnackBarBehavior.floating,
@@ -234,19 +234,9 @@ class LoginPage extends StatelessWidget {
                       }
 
                       final kycData = querySnapshot.docs.first.data();
-                   if (kycData['status'] != 'Accepted') {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              elevation: 0,
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Colors.transparent,
-                              content: AwesomeSnackbarContent(
-                                  title: 'Profile not verified ',
-                                  message:
-                                      'Your profile is not verified by our team',
-                                  contentType: ContentType.warning)));
-        return;
-      }
+                  
        if (kycData['status'] == 'pending') {
+                      // ignore: use_build_context_synchronously
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               elevation: 0,
                               behavior: SnackBarBehavior.floating,

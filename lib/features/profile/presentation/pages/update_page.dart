@@ -182,6 +182,7 @@ class UpdatePage extends StatelessWidget {
                                   .stream
                                   .listen((state) {
                                     if(state is ProfileImageUpdate){
+                                     // ignore: use_build_context_synchronously
                                      context.read<ProfileUpdateBloc>().add(
                                   AddDetailsEvent(
                                       id: profile.uid,

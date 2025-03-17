@@ -41,6 +41,7 @@ class CustomTextField extends StatelessWidget {
                   (context as Element).markNeedsBuild();
                 },
                 child:
+                    // ignore: dead_code
                     Icon(obscureText ? Icons.visibility_off : Icons.visibility),
               )
             : null,

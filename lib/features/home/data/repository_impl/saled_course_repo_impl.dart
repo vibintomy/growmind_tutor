@@ -29,7 +29,7 @@ class SaledCourseRepoImpl implements SaledCourseRepostory {
 
     
       return courses;
-    } catch (e, stackTrace) {
+    } catch (e) {
      
       throw Exception('Failed to get the data');
     }

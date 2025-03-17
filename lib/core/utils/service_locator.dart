@@ -1,6 +1,9 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:growmind_tutuor/core/utils/cloudinary.dart';
+import 'package:growmind_tutuor/core/utils/notification_service.dart';
 import 'package:growmind_tutuor/features/auth/data/repository/tutor_repository_impl.dart';
 import 'package:growmind_tutuor/features/auth/domain/repositories/tutor_repositories.dart';
 import 'package:growmind_tutuor/features/auth/domain/usecases/kyc_usecases.dart';
@@ -15,27 +18,33 @@ import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_send_me
 import 'package:growmind_tutuor/features/chat/domain/domain/usecases/get_student_info.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/conversation_bloc/conversation_bloc.dart';
+import 'package:growmind_tutuor/features/home/data/data_source/fcm_datasource.dart';
+import 'package:growmind_tutuor/features/home/data/data_source/fcm_datasource_impl.dart';
 import 'package:growmind_tutuor/features/home/data/data_source/saled_course_datasource.dart';
 import 'package:growmind_tutuor/features/home/data/data_source/student_datasource.dart';
 import 'package:growmind_tutuor/features/home/data/data_source/student_datasource_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/fetch_category_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/fetch_course_repoimpl.dart';
+import 'package:growmind_tutuor/features/home/data/repository_impl/notification_repo_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/saled_course_repo_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/student_repo_impl.dart';
 import 'package:growmind_tutuor/features/home/data/repository_impl/upload_course_repoimpl.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_category_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_course_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/fetch_student_repositories.dart';
+import 'package:growmind_tutuor/features/home/domain/repository/notification_repositories.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/saled_course_repostory.dart';
 import 'package:growmind_tutuor/features/home/domain/repository/upload_course_repo.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_category_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/fetch_student_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/get_saled_course_usecase.dart';
+import 'package:growmind_tutuor/features/home/domain/usecases/send_notifications_usecases.dart';
 import 'package:growmind_tutuor/features/home/domain/usecases/upload_course_usecases.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/create_course_bloc/create_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_category_bloc/bloc/fetch_category_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/fetch_course_bloc/fetch_course_bloc.dart';
+import 'package:growmind_tutuor/features/home/presentation/bloc/notification_bloc.dart/notification_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/sales_course_bloc/sales_course_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/student_bloc/student_bloc.dart';
 import 'package:growmind_tutuor/features/profile/data/datasource/profile_remote_datasorce.dart';
@@ -47,6 +56,7 @@ import 'package:growmind_tutuor/features/profile/domain/usecases/get_profile.dar
 import 'package:growmind_tutuor/features/profile/domain/usecases/update_profile_usecases.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:growmind_tutuor/features/profile/presentation/bloc/profile_update_bloc/bloc/profile_update_bloc.dart';
+import 'package:http/http.dart' as http;
 
 final getIt = GetIt.instance;
 
@@ -63,6 +73,13 @@ void setup() {
         cloudinary: getIt<Cloudinary>(),
         firestore: getIt<FirebaseFirestore>(),
       ));
+       getIt.registerLazySingleton<FlutterLocalNotificationsPlugin>(
+      () => FlutterLocalNotificationsPlugin());
+  getIt.registerLazySingleton<FirebaseMessaging>(
+      () => FirebaseMessaging.instance);
+      getIt.registerLazySingleton<http.Client>(() => http.Client());
+  getIt.registerLazySingleton<NotificationService>(() => NotificationService(
+      getIt<FlutterLocalNotificationsPlugin>(), getIt<FirebaseMessaging>()));
   getIt.registerLazySingleton<ProfileRemoteDatasource>(
       () => ProfileRemoteDatasource(getIt<FirebaseFirestore>()));
 
@@ -88,6 +105,10 @@ void setup() {
       () => StudentDatasourceImpl(getIt<FirebaseFirestore>()));
   getIt.registerLazySingleton<FetchStudentRepositories>(
       () => StudentRepoImpl(getIt<StudentDatasource>()));
+       getIt.registerLazySingleton<FCMDatasource>(() =>
+      FCMDatasourceImpl(getIt<FirebaseMessaging>(), getIt<http.Client>()));
+  getIt.registerLazySingleton<NotificationRepositories>(
+      () => NotificationRepoImpl(getIt<FCMDatasource>()));
   // Domain Layer
   getIt.registerLazySingleton(
       () => UploadPDFUseCase(getIt<TutorRepositories>()));
@@ -116,6 +137,9 @@ void setup() {
       () => GetSaledCourseUsecase(getIt<SaledCourseRepostory>()));
   getIt.registerLazySingleton(
       () => FetchStudentUsecases(getIt<FetchStudentRepositories>()));
+        getIt.registerLazySingleton(
+      () => SendNotificationUsecases(getIt<NotificationRepositories>()));
+
   // Presentation Layer
   getIt.registerFactory(() => TutorKycBloc(
         uploadPDFUseCase: getIt<UploadPDFUseCase>(),
@@ -137,4 +161,6 @@ void setup() {
       getStudentProfile: getIt<GetStudentProfile>()));
   getIt.registerFactory(() => SalesCourseBloc(getIt<GetSaledCourseUsecase>()));
   getIt.registerFactory(() => StudentBloc(getIt<FetchStudentUsecases>()));
+ getIt.registerFactory(() => NotificationBloc(
+      getIt<SendNotificationUsecases>(), getIt<NotificationRepositories>()));
 }

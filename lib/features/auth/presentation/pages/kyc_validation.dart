@@ -5,7 +5,7 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/core/utils/validator.dart';
 import 'package:growmind_tutuor/features/auth/presentation/pages/kyc_verification_page.dart';
 import 'package:growmind_tutuor/features/auth/presentation/widgets/text_fields.dart';
-import 'package:growmind_tutuor/features/bottom_navigation/presentation/pages/bottom_navigation.dart';
+
 
 class KycValidation extends StatelessWidget {
   KycValidation({super.key});
@@ -32,7 +32,7 @@ class KycValidation extends StatelessWidget {
                   ),
                   kheight2,
                   Center(
-                    child: Container(
+                    child: SizedBox(
                       height: 150,
                       width: 150,
                       child: Image.asset('assets/logo/customer.png'),
@@ -104,6 +104,7 @@ class KycValidation extends StatelessWidget {
         await kycCollection.where('email', isEqualTo: email).limit(1).get();
 
     if (querySnapshot.docs.isEmpty) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         elevation: 0,
         behavior: SnackBarBehavior.floating,
@@ -120,9 +121,10 @@ class KycValidation extends StatelessWidget {
 
    
     Navigator.pushReplacement(
+      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
-        builder: (context) => KycVerificationPage(),
+        builder: (context) =>const KycVerificationPage(),
       ),
     );
   }

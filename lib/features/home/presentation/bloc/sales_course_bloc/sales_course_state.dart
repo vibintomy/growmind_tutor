@@ -1,4 +1,4 @@
-import 'package:growmind_tutuor/core/error/failures.dart';
+
 import 'package:growmind_tutuor/features/home/domain/entities/saled_course.dart';
 
 abstract class SalesCourseState {}

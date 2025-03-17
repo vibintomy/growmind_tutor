@@ -26,12 +26,16 @@ class SectionPage extends StatefulWidget {
 }
 
 class _SectionPageState extends State<SectionPage> {
-  final List<Map<String, String>> sections = [];
+  final List<Map<String, dynamic>> sections = [];
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final List<VideoPlayerController?> videoController = [];
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
+  
+  // Add upload progress tracking
+  final List<double> uploadProgress = [];
+  final List<bool> isUploading = [];
 
   @override
   void dispose() {
@@ -51,6 +55,8 @@ class _SectionPageState extends State<SectionPage> {
           'videoPath': '', // Placeholder for the attached video path
         });
         videoController.add(null);
+        uploadProgress.add(0.0);
+        isUploading.add(false);
         nameController.clear();
         descriptionController.clear();
       });
@@ -62,30 +68,73 @@ class _SectionPageState extends State<SectionPage> {
   }
 
   void pickVideo(int index) async {
-    isLoading.value = true;
+    // Reset progress and set uploading state
+    setState(() {
+      uploadProgress[index] = 0.0;
+      isUploading[index] = true;
+    });
+    
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.video,
     );
 
     if (result != null && result.files.isNotEmpty) {
       final videoPath = result.files.single.path ?? '';
-      final controller = VideoPlayerController.file(File(videoPath))
-        ..initialize().then((_) {
-          setState(() {
-            sections[index]['vedioPath'] = videoPath;
-            isLoading.value = false;
+      final videoFile = File(videoPath);
+      
+      // Simulate upload process with progress updates
+      // In a real app, this would be an actual upload to a server
+      simulateVideoUpload(videoFile, index).then((_) {
+        // Initialize video player after upload completes
+        final controller = VideoPlayerController.file(videoFile)
+          ..initialize().then((_) {
+            setState(() {
+              sections[index]['videoPath'] = videoPath;
+              isUploading[index] = false;
+            });
           });
+        
+        videoController[index] = controller;
+        setState(() {
+          sections[index]['videoPath'] = videoPath;
         });
-      videoController[index] = controller;
-      setState(() {
-        sections[index]['videoPath'] = result.files.single.path ?? '';
       });
     } else {
-      isLoading.value = false;
+      setState(() {
+        isUploading[index] = false;
+      });
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No video selected')),
       );
     }
+  }
+  
+  // Method to simulate video upload with progress
+  Future<void> simulateVideoUpload(File videoFile, int index) async {
+    final fileSize = await videoFile.length();
+    int uploadedBytes = 0;
+    
+    // Calculate how many steps we'll need for a smooth animation
+    final stepSize = fileSize ~/ 100;
+    final stepDelay = Duration(milliseconds: 50);
+    
+    while (uploadedBytes < fileSize) {
+      await Future.delayed(stepDelay);
+      uploadedBytes += stepSize;
+      if (uploadedBytes > fileSize) uploadedBytes = fileSize;
+      
+      final progress = uploadedBytes / fileSize;
+      setState(() {
+        uploadProgress[index] = progress;
+        
+        // Also update sections map to include progress for persistence
+        sections[index]['uploadProgress'] = progress;
+      });
+    }
+    
+    // Simulate some processing time after upload completes
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   void removeSection(int index) {
@@ -93,6 +142,8 @@ class _SectionPageState extends State<SectionPage> {
       sections.removeAt(index);
       videoController[index]?.dispose();
       videoController.removeAt(index);
+      uploadProgress.removeAt(index);
+      isUploading.removeAt(index);
     });
   }
 
@@ -101,6 +152,7 @@ class _SectionPageState extends State<SectionPage> {
       sections[index]['videoPath'] = '';
       videoController[index]?.dispose();
       videoController[index] = null;
+      uploadProgress[index] = 0.0;
     });
   }
 
@@ -149,6 +201,9 @@ class _SectionPageState extends State<SectionPage> {
                   itemBuilder: (context, index) {
                     final section = sections[index];
                     final controller = videoController[index];
+                    final progress = uploadProgress[index];
+                    final uploading = isUploading[index];
+                    
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Container(
@@ -197,16 +252,50 @@ class _SectionPageState extends State<SectionPage> {
                                       child: VideoPlayer(controller)),
                                 ),
                               kheight,
+                              // Video upload progress indicator
+                              if (uploading)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.cloud_upload,
+                                          color: Colors.blue,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Uploading video... ${(progress * 100).toInt()}%',
+                                          style: const TextStyle(
+                                            color: Colors.blue,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    LinearProgressIndicator(
+                                      value: progress,
+                                      backgroundColor: Colors.grey[300],
+                                      valueColor: const AlwaysStoppedAnimation<Color>(
+                                        Colors.blue,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                ),
                               Row(
                                 children: [
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blue,
                                     ),
-                                    onPressed: () => pickVideo(index),
-                                    child: const Text(
-                                      'Attach Video',
-                                      style: TextStyle(color: textColor),
+                                    onPressed: uploading ? null : () => pickVideo(index),
+                                    child: Text(
+                                      section['videoPath']!.isEmpty 
+                                          ? 'Attach Video' 
+                                          : 'Replace Video',
+                                      style: const TextStyle(color: textColor),
                                     ),
                                   ),
                                   kwidth,
@@ -215,7 +304,7 @@ class _SectionPageState extends State<SectionPage> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.red,
                                       ),
-                                      onPressed: () => removeVedio(index),
+                                      onPressed: uploading ? null : () => removeVedio(index),
                                       child: const Text(
                                         'Remove Video',
                                         style: TextStyle(color: textColor),
@@ -302,6 +391,16 @@ class _SectionPageState extends State<SectionPage> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: mainColor),
                     onPressed: () {
+                      // Check if any uploads are still in progress
+                      if (isUploading.contains(true)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Please wait for all uploads to complete')),
+                        );
+                        return;
+                      }
+                      
                       if (sections.isEmpty ||
                           sections.any((s) => s['videoPath']!.isEmpty)) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -312,18 +411,30 @@ class _SectionPageState extends State<SectionPage> {
                         return;
                       }
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PricePage(
-                            courseName: widget.courseName,
-                            description: widget.description,
-                            category: widget.category,
-                            subCategory: widget.subCategory,
-                            sections: sections,
-                          ),
-                        ),
-                      );
+                    // Replace the Navigator.push code with this:
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) {
+      // Convert sections to List<Map<String, String>> by removing non-string values
+      final List<Map<String, String>> formattedSections = sections.map((section) {
+        return {
+          'sectionName': section['sectionName'] as String,
+          'sectionDescription': section['sectionDescription'] as String,
+          'videoPath': section['videoPath'] as String,
+        };
+      }).toList();
+      
+      return PricePage(
+        courseName: widget.courseName,
+        description: widget.description,
+        category: widget.category,
+        subCategory: widget.subCategory,
+        sections: formattedSections,
+      );
+    },
+  ),
+);
                     },
                     child: const Text(
                       'Next',
