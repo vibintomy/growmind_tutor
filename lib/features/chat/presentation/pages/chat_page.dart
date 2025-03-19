@@ -44,6 +44,8 @@ class ChatPage extends StatelessWidget {
                   final conversation = state.conversations[index];
                   final studentId = conversation.studentId;
                   final studentProfile = state.studentProfiles[studentId];
+                  final lastMessage = state.conversations[index].lastMessage;
+                 
                   final studentName = studentProfile?.name ?? 'Unknown student';
                   final dateTime = DateTime.fromMillisecondsSinceEpoch(
                       conversation.lastMessageTime);
@@ -57,17 +59,19 @@ class ChatPage extends StatelessWidget {
                               ? NetworkImage(studentProfile!.imageUrl!)
                               : null,
                         ),
-                        title: Text(studentName),
-                        subtitle: Text(formattedTime),
+                        title: Text(studentName,style:const TextStyle(fontWeight: FontWeight.bold),),
+                        subtitle: Text(lastMessage),
+                        trailing: Text(formattedTime),
                         onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => MessagePage(
-                                    studentId: studentId,
-                                      imageUrl: studentProfile!.imageUrl??'',
-                                      name: studentName,
-                                    )));
+                                        studentId: studentId,
+                                        imageUrl:
+                                            studentProfile!.imageUrl ?? '',
+                                        name: studentName,
+                                      )));
                         },
                       ),
                       const Divider(

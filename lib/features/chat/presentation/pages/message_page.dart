@@ -6,6 +6,7 @@ import 'package:growmind_tutuor/core/utils/constants.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_bloc.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_event.dart';
 import 'package:growmind_tutuor/features/chat/presentation/bloc/chat_bloc/chat_state.dart';
+import 'package:growmind_tutuor/features/chat/presentation/widgets/chat_ui.dart';
 import 'package:growmind_tutuor/features/home/domain/entities/notification_entities.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/notification_bloc.dart/notification_bloc.dart';
 import 'package:growmind_tutuor/features/home/presentation/bloc/notification_bloc.dart/notification_event.dart';
@@ -22,7 +23,7 @@ class MessagePage extends HookWidget {
     required this.imageUrl,
     required this.name,
   });
-
+ 
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser;
@@ -30,20 +31,28 @@ class MessagePage extends HookWidget {
     final messageController = useTextEditingController();
     final scrollController = useScrollController();
 
+    
     void scrollToBottom() {
-      if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
     }
 
     // Hook for initialization
     useEffect(() {
       context.read<ChatBloc>().add(LoadMessages(studentId, tutorId));
       context.read<NotificationBloc>().add(SubscribeToUserTopic(tutorId));
+      
+      // Schedule a scroll to bottom after initial load
+      Future.delayed(const Duration(milliseconds: 500), scrollToBottom);
+      
       return () {
         messageController.dispose();
       };
@@ -55,7 +64,7 @@ class MessagePage extends HookWidget {
         context.read<ChatBloc>().add(SendMessages(
             message: text, tutorId: tutorId, studentId: studentId));
 
- final notification = NotificationEntities(
+        final notification = NotificationEntities(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
             body: text,
             title: "New message from ${userId.displayName ?? 'User'}",
@@ -64,13 +73,16 @@ class MessagePage extends HookWidget {
             senderId: userId.uid,
             timeStamp: DateTime.now());
       
-        
         context.read<NotificationBloc>().add(SendNotification(notification));
         messageController.clear();
-
-        Future.delayed(const Duration(milliseconds: 300), scrollToBottom);
+        
+        // Scroll to bottom after sending message
+        scrollToBottom();
       }
     }
+
+    // Helper function to format date for chat headers
+   
 
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -115,8 +127,7 @@ class MessagePage extends HookWidget {
                 }
                 // Scroll to bottom when new messages are loaded
                 if (state is ChatLoaded) {
-                  Future.delayed(
-                      const Duration(milliseconds: 300), scrollToBottom);
+                  scrollToBottom();
                 }
               },
               builder: (context, state) {
@@ -149,29 +160,35 @@ class MessagePage extends HookWidget {
           child: Row(
             children: [
               Expanded(
-                  child: TextField(
-                controller: messageController,
-                decoration: InputDecoration(
+                child: TextField(
+                  controller: messageController,
+                  decoration: InputDecoration(
                     hintText: 'Type a message...',
                     filled: true,
                     fillColor: textColor,
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20))),
-                // Enable sending message on Enter key
-                onSubmitted: (_) => sendMessage(),
-              )),
+                      borderRadius: BorderRadius.circular(20)
+                    )
+                  ),
+                  // Enable sending message on Enter key
+                  onSubmitted: (_) => sendMessage(),
+                )
+              ),
               kwidth,
               Container(
                 height: 50,
                 width: 50,
                 decoration: const BoxDecoration(
-                    color: textColor, shape: BoxShape.circle),
+                  color: textColor, 
+                  shape: BoxShape.circle
+                ),
                 child: IconButton(
-                    onPressed: sendMessage,
-                    icon: const Icon(
-                      Icons.send,
-                      color: Colors.blue,
-                    )),
+                  onPressed: sendMessage,
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.blue,
+                  )
+                ),
               )
             ],
           ),
@@ -180,57 +197,5 @@ class MessagePage extends HookWidget {
     );
   }
 
-  Padding chatUi(BuildContext context, ScrollController scrollController,
-      ChatLoaded state, String tutorId) {
-    // Sort messages by timestamp to ensure correct chronological order
-    final sortedMessages = List.from(state.message);
-    sortedMessages.sort((a, b) => a.timeStamp.millisecondsSinceEpoch
-        .compareTo(b.timeStamp.millisecondsSinceEpoch));
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 90),
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/logo/telegrame background 🩷🥹.jpeg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: ListView.builder(
-          controller: scrollController,
-          itemCount: sortedMessages.length,
-          itemBuilder: (context, index) {
-            final message = sortedMessages[index];
-            final isMe = message.senderId == tutorId;
-            return Align(
-              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isMe ? Colors.blue[100] : Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(message.message),
-                    kheight,
-                    Text(
-                      DateFormat('HH:mm').format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                              message.timeStamp.millisecondsSinceEpoch)),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    )
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
 }

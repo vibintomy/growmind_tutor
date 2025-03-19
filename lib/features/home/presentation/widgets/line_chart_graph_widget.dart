@@ -184,13 +184,13 @@ class LineChartGraphWidget extends StatelessWidget {
   double _getMaxYValue(List<DailySalesData> data) {
     if (data.isEmpty) return 50;
     final maxValue = data.map((e) => e.totalValue).reduce((a, b) => a > b ? a : b);
-    return maxValue * 1.2; 
+     return maxValue <= 0 ? 50 : maxValue * 1.2;
   }
 
   double _getYAxisInterval(List<DailySalesData> data) {
     if (data.isEmpty) return 10;
     final maxValue = _getMaxYValue(data);
-    return maxValue / 5;
+    return maxValue <= 0 ? 10 : maxValue / 5;
   }
 }
 

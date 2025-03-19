@@ -82,50 +82,56 @@ class KycValidation extends StatelessWidget {
   }
 
   void loginUser(BuildContext context) async {
-    final email = emailController.text.trim();
+  final email = emailController.text.trim();
 
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        content: AwesomeSnackbarContent(
-          title: 'Error',
-          message: 'Please enter an email address!',
-          contentType: ContentType.failure,
-        ),
-      ));
-      return;
-    }
+  if (email.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Error',
+        message: 'Please enter an email address!',
+        contentType: ContentType.failure,
+      ),
+    ));
+    return;
+  }
 
-    // Query the 'tutors' collection to find a matching email
-    final kycCollection = FirebaseFirestore.instance.collection('tutors');
-    final querySnapshot =
-        await kycCollection.where('email', isEqualTo: email).limit(1).get();
+  // Query the 'tutors' collection to find a matching email
+  final kycCollection = FirebaseFirestore.instance.collection('tutors');
+  final querySnapshot =
+      await kycCollection.where('email', isEqualTo: email).limit(1).get();
 
-    if (querySnapshot.docs.isEmpty) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        content: AwesomeSnackbarContent(
-          title: 'Email Not Found',
-          message: 'The entered email is not registered!',
-          contentType: ContentType.warning,
-        ),
-      ));
-      return;
-    }
+  if (querySnapshot.docs.isEmpty) {
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Email Not Found',
+        message: 'The entered email is not registered!',
+        contentType: ContentType.warning,
+      ),
+    ));
+    return;
+  }
 
+  // Check if the email is already authenticated using Google Sign-In
+  final userDoc = querySnapshot.docs.first;
+  final bool isGoogleAuthenticated = userDoc.data().containsKey('googleAuthProvider') ? 
+      userDoc.get('googleAuthProvider') ?? false : false;
 
-   
+  if (isGoogleAuthenticated) {
+    // Navigate to the appropriate page for Google-authenticated users
+    // ignore: use_build_context_synchronously
     Navigator.pushReplacement(
-      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
-        builder: (context) =>const KycVerificationPage(),
+        builder: (context) => const KycVerificationPage(), // Replace with your actual page
       ),
     );
-  }
+  } 
+}
 }

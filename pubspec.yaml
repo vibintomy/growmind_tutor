@@ -57,6 +57,8 @@ dependencies:
   fl_chart: ^0.70.2
   syncfusion_flutter_charts: ^28.2.9
   flutter_local_notifications: ^18.0.1
+  google_sign_in: ^6.3.0
+  url_launcher: ^6.3.1
 
 
   # The following adds the Cupertino Icons font to your application.

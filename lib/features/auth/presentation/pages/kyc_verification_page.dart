@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -219,24 +218,24 @@ class _KycVerificationPageState extends State<KycVerificationPage> {
     }
 
     // Query the 'tutors' collection to find a matching email
-    final kycCollection = FirebaseFirestore.instance.collection('tutors');
-    final querySnapshot =
-        await kycCollection.where('email', isEqualTo: email).limit(1).get();
+    // final kycCollection = FirebaseFirestore.instance.collection('tutors');
+    // final querySnapshot =
+    //     await kycCollection.where('email', isEqualTo: email).limit(1).get();
 
-    if (querySnapshot.docs.isEmpty) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        content: AwesomeSnackbarContent(
-          title: 'Email Not Found',
-          message: 'The entered email is not registered!',
-          contentType: ContentType.warning,
-        ),
-      ));
-      return;
-    }
+    // if (querySnapshot.docs.isEmpty) {
+    //   // ignore: use_build_context_synchronously
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     elevation: 0,
+    //     behavior: SnackBarBehavior.floating,
+    //     backgroundColor: Colors.transparent,
+    //     content: AwesomeSnackbarContent(
+    //       title: 'Email Not Found',
+    //       message: 'The entered email is not registered!',
+    //       contentType: ContentType.warning,
+    //     ),
+    //   ));
+    //   return;
+    // }
       Navigator.pushReplacement(
                             // ignore: use_build_context_synchronously
                             context,

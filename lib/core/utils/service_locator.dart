@@ -4,9 +4,14 @@ import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:growmind_tutuor/core/utils/cloudinary.dart';
 import 'package:growmind_tutuor/core/utils/notification_service.dart';
+import 'package:growmind_tutuor/features/auth/data/datasource/auth_local_datasource.dart';
+import 'package:growmind_tutuor/features/auth/data/repository/google_auth_repository_impl.dart';
 import 'package:growmind_tutuor/features/auth/data/repository/tutor_repository_impl.dart';
+import 'package:growmind_tutuor/features/auth/domain/repositories/google_auth_repositories.dart';
 import 'package:growmind_tutuor/features/auth/domain/repositories/tutor_repositories.dart';
+import 'package:growmind_tutuor/features/auth/domain/usecases/google_auth_usecases.dart';
 import 'package:growmind_tutuor/features/auth/domain/usecases/kyc_usecases.dart';
+import 'package:growmind_tutuor/features/auth/presentation/bloc/google_auth_bloc/google_auth_bloc.dart';
 import 'package:growmind_tutuor/features/auth/presentation/bloc/kyc_bloc/kyc_bloc.dart';
 import 'package:growmind_tutuor/features/chat/data/datasource/chat_remote_datasource.dart';
 import 'package:growmind_tutuor/features/chat/data/datasource/chat_remote_datasource_impl.dart';
@@ -73,11 +78,11 @@ void setup() {
         cloudinary: getIt<Cloudinary>(),
         firestore: getIt<FirebaseFirestore>(),
       ));
-       getIt.registerLazySingleton<FlutterLocalNotificationsPlugin>(
+  getIt.registerLazySingleton<FlutterLocalNotificationsPlugin>(
       () => FlutterLocalNotificationsPlugin());
   getIt.registerLazySingleton<FirebaseMessaging>(
       () => FirebaseMessaging.instance);
-      getIt.registerLazySingleton<http.Client>(() => http.Client());
+  getIt.registerLazySingleton<http.Client>(() => http.Client());
   getIt.registerLazySingleton<NotificationService>(() => NotificationService(
       getIt<FlutterLocalNotificationsPlugin>(), getIt<FirebaseMessaging>()));
   getIt.registerLazySingleton<ProfileRemoteDatasource>(
@@ -105,10 +110,14 @@ void setup() {
       () => StudentDatasourceImpl(getIt<FirebaseFirestore>()));
   getIt.registerLazySingleton<FetchStudentRepositories>(
       () => StudentRepoImpl(getIt<StudentDatasource>()));
-       getIt.registerLazySingleton<FCMDatasource>(() =>
+  getIt.registerLazySingleton<FCMDatasource>(() =>
       FCMDatasourceImpl(getIt<FirebaseMessaging>(), getIt<http.Client>()));
   getIt.registerLazySingleton<NotificationRepositories>(
       () => NotificationRepoImpl(getIt<FCMDatasource>()));
+       getIt.registerLazySingleton<AuthLocalDataSource>(
+      () => AuthLocalDataSourceImpl());
+  getIt.registerLazySingleton<GoogleAuthRepositories>(
+      () => GoogleAuthRepositoryImpl(authLocalDataSource: getIt<AuthLocalDataSource>()));
   // Domain Layer
   getIt.registerLazySingleton(
       () => UploadPDFUseCase(getIt<TutorRepositories>()));
@@ -137,8 +146,10 @@ void setup() {
       () => GetSaledCourseUsecase(getIt<SaledCourseRepostory>()));
   getIt.registerLazySingleton(
       () => FetchStudentUsecases(getIt<FetchStudentRepositories>()));
-        getIt.registerLazySingleton(
+  getIt.registerLazySingleton(
       () => SendNotificationUsecases(getIt<NotificationRepositories>()));
+  getIt.registerLazySingleton(
+      () => GoogleAuthUsecases(getIt<GoogleAuthRepositories>()));
 
   // Presentation Layer
   getIt.registerFactory(() => TutorKycBloc(
@@ -161,6 +172,7 @@ void setup() {
       getStudentProfile: getIt<GetStudentProfile>()));
   getIt.registerFactory(() => SalesCourseBloc(getIt<GetSaledCourseUsecase>()));
   getIt.registerFactory(() => StudentBloc(getIt<FetchStudentUsecases>()));
- getIt.registerFactory(() => NotificationBloc(
+  getIt.registerFactory(() => NotificationBloc(
       getIt<SendNotificationUsecases>(), getIt<NotificationRepositories>()));
+  getIt.registerFactory(() => GoogleAuthBloc(getIt<GoogleAuthUsecases>()));
 }

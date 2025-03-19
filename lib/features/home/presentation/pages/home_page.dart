@@ -27,48 +27,18 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    BlocBuilder<ProfileBloc, ProfileState>(
-                        builder: (context, state) {
-                      if (state is ProfileLoaded) {
-                        final profile = state.profile;
-                        return Text(
-                          'Hi,${profile.displayName.toUpperCase()}👋',
-                          style: const TextStyle(
-                              fontSize: 27, fontWeight: FontWeight.bold),
-                        );
-                      }
-                      return const Text('');
-                    }),
-                    Container(
-                        height: 50,
-                        width: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black,
-                        ),
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: Container(
-                                height: 45,
-                                width: 95,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white,
-                                ),
-                                child: IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                        Icons.notifications_outlined)),
-                              ),
-                            ),
-                          ],
-                        ))
-                  ],
-                ),
+                BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                  if (state is ProfileLoaded) {
+                    final profile = state.profile;
+                    return Text(
+                      'Hi,${profile.displayName.toUpperCase()}👋',
+                      style: const TextStyle(
+                          fontSize: 27, fontWeight: FontWeight.bold),
+                    );
+                  }
+                  return const Text('');
+                }),
                 const Text(
                   'What would like to teach Today?\nAdd Below.',
                   style: TextStyle(
