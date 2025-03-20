@@ -98,13 +98,13 @@ class KycValidation extends StatelessWidget {
     return;
   }
 
-  // Query the 'tutors' collection to find a matching email
+
   final kycCollection = FirebaseFirestore.instance.collection('tutors');
   final querySnapshot =
       await kycCollection.where('email', isEqualTo: email).limit(1).get();
 
   if (querySnapshot.docs.isEmpty) {
-    // ignore: use_build_context_synchronously
+  
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.floating,
@@ -118,20 +118,13 @@ class KycValidation extends StatelessWidget {
     return;
   }
 
-  // Check if the email is already authenticated using Google Sign-In
-  final userDoc = querySnapshot.docs.first;
-  final bool isGoogleAuthenticated = userDoc.data().containsKey('googleAuthProvider') ? 
-      userDoc.get('googleAuthProvider') ?? false : false;
-
-  if (isGoogleAuthenticated) {
-    // Navigate to the appropriate page for Google-authenticated users
-    // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const KycVerificationPage(), // Replace with your actual page
-      ),
-    );
-  } 
+ 
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const KycVerificationPage(),
+    ),
+  );
 }
+
 }

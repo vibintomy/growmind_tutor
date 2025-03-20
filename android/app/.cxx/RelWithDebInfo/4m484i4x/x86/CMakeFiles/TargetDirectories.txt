@@ -1,0 +1,2 @@
+C:/Users/HP/growmind_tutor/growmind_tutuor/android/app/.cxx/RelWithDebInfo/4m484i4x/x86/CMakeFiles/edit_cache.dir
+C:/Users/HP/growmind_tutor/growmind_tutuor/android/app/.cxx/RelWithDebInfo/4m484i4x/x86/CMakeFiles/rebuild_cache.dir

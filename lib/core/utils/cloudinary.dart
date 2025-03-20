@@ -19,7 +19,7 @@ class Cloudinary {
   }
 
   Future<String> uploadFile(File file, {String? resourceType}) async {
-    // Determine resource type based on file extension if not provided
+   
     final extension = file.path.split('.').last.toLowerCase();
 
     final determinedResourceType = resourceType ??
